@@ -1266,8 +1266,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 224,
-											"top": 32,
+											"left": 192,
 											"height": 13
 										},
 										{
@@ -1277,8 +1276,8 @@
 												"$ref": "AAAAAAF1DqhLq554Lhg="
 											},
 											"font": "Arial;13;1",
-											"left": 309,
-											"top": 719,
+											"left": 293,
+											"top": 703,
 											"width": 262,
 											"height": 13,
 											"text": "GameManager"
@@ -1291,8 +1290,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 224,
-											"top": 32,
+											"left": 192,
 											"width": 73.67724609375,
 											"height": 13,
 											"text": "(from Model)"
@@ -1305,15 +1303,14 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 224,
-											"top": 32,
+											"left": 192,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 304,
-									"top": 712,
+									"left": 288,
+									"top": 696,
 									"width": 272,
 									"height": 25,
 									"stereotypeLabel": {
@@ -1339,8 +1336,8 @@
 										"$ref": "AAAAAAF1DqhLqp513RY="
 									},
 									"font": "Arial;13;0",
-									"left": 304,
-									"top": 737,
+									"left": 288,
+									"top": 721,
 									"width": 272,
 									"height": 10
 								},
@@ -1354,8 +1351,8 @@
 										"$ref": "AAAAAAF1DqhLqp513RY="
 									},
 									"font": "Arial;13;0",
-									"left": 304,
-									"top": 747,
+									"left": 288,
+									"top": 731,
 									"width": 272,
 									"height": 10
 								},
@@ -1370,8 +1367,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 112,
-									"top": 16,
+									"left": 96,
 									"width": 10,
 									"height": 10
 								},
@@ -1386,16 +1382,15 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 112,
-									"top": 16,
+									"left": 96,
 									"width": 10,
 									"height": 10
 								}
 							],
 							"font": "Arial;13;0",
 							"containerChangeable": true,
-							"left": 304,
-							"top": 712,
+							"left": 288,
+							"top": 696,
 							"width": 272,
 							"height": 232,
 							"nameCompartment": {
