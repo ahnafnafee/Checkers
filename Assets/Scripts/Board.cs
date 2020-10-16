@@ -30,7 +30,7 @@ public class Board : MonoBehaviour
 
         int x = (int)mouseOver.x;
         int y = (int)mouseOver.y;
-
+        
         if (Input.GetMouseButtonDown(0))
         {
             if (selected == null) {
@@ -47,6 +47,17 @@ public class Board : MonoBehaviour
             else
             {
                 selected.select(false);
+                if (SelectToken(x, y))
+                {
+                    Debug.Log("Selected " + x.ToString() + " " + y.ToString());
+                    if (selected.getMovesNum() > 0)
+                    {
+                        selected.select(true);
+                        displayMoves();
+                    }
+                }
+                else
+                { 
                 Token t = tokens[selected.getX(), selected.getY()];
                 
                 
@@ -60,8 +71,12 @@ public class Board : MonoBehaviour
                     findMoves();
                     Debug.Log("Moved token");
                 }
+
+
+
                 selected = null;
                 clearHighlights();
+                }
             }
             debugBoard();
         }
@@ -140,8 +155,12 @@ public class Board : MonoBehaviour
         Token t = tokens[x, y];
         if (t != null)
         {
-            selected = t;
-            return true;
+            if (t.getSide() == "player")
+            {
+                clearHighlights();
+                selected = t;
+                return true;
+            }
         }
         return false;
     }
