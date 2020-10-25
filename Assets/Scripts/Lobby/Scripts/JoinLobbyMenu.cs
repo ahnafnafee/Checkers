@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DapperDino.Mirror.Tutorials.Lobby
+namespace Lobby.Scripts
 {
     public class JoinLobbyMenu : MonoBehaviour
     {

@@ -1,11 +1,11 @@
-﻿using Mirror;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace DapperDino.Mirror.Tutorials.Lobby
+namespace Lobby.Scripts
 {
     public class NetworkManagerLobby : NetworkManager
     {

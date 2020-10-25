@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DapperDino.Mirror.Tutorials.Lobby
+namespace Lobby.Scripts
 {
     public class MainMenu : MonoBehaviour
     {
