@@ -5,7 +5,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class NetworkManagerLobby : NetworkManager
+namespace DapperDino.Mirror.Tutorials.Lobby
+{
+    public class NetworkManagerLobby : NetworkManager
     {
         [SerializeField] private int minPlayers = 2;
         [Scene] [SerializeField] private string menuScene = string.Empty;
@@ -15,13 +17,9 @@ public class NetworkManagerLobby : NetworkManager
 
         [Header("Game")]
         [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
-        [SerializeField] private GameObject playerSpawnSystem = null;
-        [SerializeField] private GameObject roundSystem = null;
 
         public static event Action OnClientConnected;
         public static event Action OnClientDisconnected;
-        public static event Action<NetworkConnection> OnServerReadied;
-        public static event Action OnServerStopped;
 
         public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
         public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
@@ -60,7 +58,7 @@ public class NetworkManagerLobby : NetworkManager
                 return;
             }
 
-            if (SceneManager.GetActiveScene().name != menuScene)
+            if (SceneManager.GetActiveScene().path != menuScene)
             {
                 conn.Disconnect();
                 return;
@@ -69,7 +67,7 @@ public class NetworkManagerLobby : NetworkManager
 
         public override void OnServerAddPlayer(NetworkConnection conn)
         {
-            if (SceneManager.GetActiveScene().name == menuScene)
+            if (SceneManager.GetActiveScene().path == menuScene)
             {
                 bool isLeader = RoomPlayers.Count == 0;
 
@@ -97,10 +95,7 @@ public class NetworkManagerLobby : NetworkManager
 
         public override void OnStopServer()
         {
-            OnServerStopped?.Invoke();
-
             RoomPlayers.Clear();
-            GamePlayers.Clear();
         }
 
         public void NotifyPlayersOfReadyState()
@@ -125,18 +120,18 @@ public class NetworkManagerLobby : NetworkManager
 
         public void StartGame()
         {
-            if (SceneManager.GetActiveScene().name == menuScene)
+            if (SceneManager.GetActiveScene().path == menuScene)
             {
                 if (!IsReadyToStart()) { return; }
 
-                ServerChangeScene("Scene_Map_01");
+                ServerChangeScene("Scene_01");
             }
         }
 
         public override void ServerChangeScene(string newSceneName)
         {
             // From menu to game
-            if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("Scene_Map"))
+            if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Scene_01"))
             {
                 for (int i = RoomPlayers.Count - 1; i >= 0; i--)
                 {
@@ -152,23 +147,5 @@ public class NetworkManagerLobby : NetworkManager
 
             base.ServerChangeScene(newSceneName);
         }
-
-        public override void OnServerSceneChanged(string sceneName)
-        {
-            if (sceneName.StartsWith("Scene_Map"))
-            {
-                GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
-                NetworkServer.Spawn(playerSpawnSystemInstance);
-
-                GameObject roundSystemInstance = Instantiate(roundSystem);
-                NetworkServer.Spawn(roundSystemInstance);
-            }
-        }
-
-        public override void OnServerReady(NetworkConnection conn)
-        {
-            base.OnServerReady(conn);
-
-            OnServerReadied?.Invoke(conn);
-        }
     }
+}

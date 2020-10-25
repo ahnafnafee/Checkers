@@ -3,7 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NetworkRoomPlayerLobby : NetworkBehaviour
+namespace DapperDino.Mirror.Tutorials.Lobby
+{
+    public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         [Header("UI")]
         [SerializeField] private GameObject lobbyUI = null;
@@ -120,3 +122,4 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             Room.StartGame();
         }
     }
+}
