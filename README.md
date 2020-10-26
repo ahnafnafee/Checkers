@@ -11,4 +11,4 @@ The game is intended to be in 2D with a beautiful UI overlaid on it. The overall
 
 ### Activity Diagram
 
-![](D:\GitHub\Checkers\Miscellaneous\activityDiagram.png)
+![](https://raw.githubusercontent.com/ahnafnafee/Checkers/main/Miscellaneous/activityDiagram.png?token=ALQ7K4UCKASJRVTU5IUSVXC7UB75A)
