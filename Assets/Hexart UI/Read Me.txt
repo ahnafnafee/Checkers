@@ -1,0 +1,33 @@
+Hexart - Complete Main Menu UI (v1.1.4)
+-----------------------------------------
+If you're going to use Loading Screen feature and don't know how, check page 8 of this PDF:
+https://docs.wixstatic.com/ugd/a8f640_f9bfb3d52d4a4c4e87cb348af38ec881.pdf
+
+Important: Blur shaders doesn't work with LWRP & HDRP.
+Disable all of the blur object to work with SRP.
+
+Contact me via:
+E-mail: isa.steam@outlook.com
+Website: https://www.michsky.com
+Discord: https://discord.gg/VXpHyUt
+YouTube: https://www.youtube.com/c/michsky
+Unity Connect: https://connect.unity.com/u/isa-kocak
+Steam: https://steamcommunity.com/id/geezjesus/
+-----------------------------------------
+
+Changes v1.1.4
+---------------------
+• 2019.1 compatibility
+• New customizable blur system
+• Improved horizontal slider
+• Optimized some animations
+• Minor bugs fixed
+---------------------
+
+Changes v1.1.0
+---------------------
+• Added HUD scene
+• Added smooth loading screen system
+• Added borders, icons and more sprites
+• Fixed animation bug that causes flickering
+---------------------
