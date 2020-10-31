@@ -1,6 +1,6 @@
 ﻿using Mirror;
 
-namespace _Project.Scripts.Lobby.Scripts
+namespace Lobby.Scripts
 {
     public class NetworkGamePlayerLobby : NetworkBehaviour
     {

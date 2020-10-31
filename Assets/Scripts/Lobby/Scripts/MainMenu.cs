@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Project.Scripts.Lobby.Scripts
+namespace Lobby.Scripts
 {
     public class MainMenu : MonoBehaviour
     {

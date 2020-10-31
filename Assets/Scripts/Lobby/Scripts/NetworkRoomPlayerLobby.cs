@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.Scripts.Lobby.Scripts
+namespace Lobby.Scripts
 {
     public class NetworkRoomPlayerLobby : NetworkBehaviour
     {

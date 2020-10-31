@@ -5,7 +5,7 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace _Project.Scripts.Lobby.Scripts
+namespace Lobby.Scripts
 {
     public class NetworkManagerLobby : NetworkManager
     {
@@ -124,14 +124,14 @@ namespace _Project.Scripts.Lobby.Scripts
             {
                 if (!IsReadyToStart()) { return; }
 
-                ServerChangeScene("Scene_01");
+                ServerChangeScene("02_MainGame");
             }
         }
 
         public override void ServerChangeScene(string newSceneName)
         {
             // From menu to game
-            if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("Scene_01"))
+            if (SceneManager.GetActiveScene().path == menuScene && newSceneName.StartsWith("02_MainGame"))
             {
                 for (int i = RoomPlayers.Count - 1; i >= 0; i--)
                 {

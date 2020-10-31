@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Board : MonoBehaviour
 {
     private Token[,] tokens = new Token[8, 8];
-    private Token selected = null;
+    private Token selected;
     public GameObject highlightPrefab;
     public GameObject whiteTokenPrefab;
     public GameObject blackTokenPrefab;
@@ -20,13 +19,13 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        createBoard();
+        CreateBoard();
     }
 
     // Update is called once per frame
     void Update()
     {
-        updateMouseOver();
+        UpdateMouseOver();
 
         int x = (int)mouseOver.x;
         int y = (int)mouseOver.y;
@@ -36,11 +35,11 @@ public class Board : MonoBehaviour
             if (selected == null) {
                 if (SelectToken(x, y))
                 {
-                    Debug.Log("Selected " + x.ToString() + " " + y.ToString());
+                    Debug.Log("Selected " + x + " " + y);
                     if (selected.getMovesNum() > 0)
                     {
                         selected.select(true);
-                        displayMoves();
+                        DisplayMoves();
                     }
                 }
             }
@@ -49,11 +48,11 @@ public class Board : MonoBehaviour
                 selected.select(false);
                 if (SelectToken(x, y))
                 {
-                    Debug.Log("Selected " + x.ToString() + " " + y.ToString());
+                    Debug.Log("Selected " + x + " " + y);
                     if (selected.getMovesNum() > 0)
                     {
                         selected.select(true);
-                        displayMoves();
+                        DisplayMoves();
                     }
                 }
                 else
@@ -61,30 +60,30 @@ public class Board : MonoBehaviour
                 Token t = tokens[selected.getX(), selected.getY()];
                 
                 
-                if (checkValid(x, y))
+                if (CheckValid(x, y))
                 {
-                    moveToken(t, x, y);
+                    MoveToken(t, x, y);
                     if (y == 7)
                     {
                         t.promote();
                     }
-                    findMoves();
+                    FindMoves();
                     Debug.Log("Moved token");
                 }
 
 
 
                 selected = null;
-                clearHighlights();
+                ClearHighlights();
                 }
             }
-            debugBoard();
+            DebugBoard();
         }
 
     }
 
     //Check if the selected move is in the list of valid moves for the selected token
-    private bool checkValid(int x, int y)
+    private bool CheckValid(int x, int y)
     {
         for (int i = 0; i< highlights.Count; i++)
         {
@@ -95,7 +94,7 @@ public class Board : MonoBehaviour
     }
 
     //Get mouse location
-    private void updateMouseOver()
+    private void UpdateMouseOver()
     {
         if (!Camera.main)
         {
@@ -117,27 +116,26 @@ public class Board : MonoBehaviour
     }
 
     //Create all tokens
-    private void createBoard()
+    private void CreateBoard()
     {
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 8; x += 2)
             {
                 if (y % 2 == 1)
-                    createToken(x + 1, y);
+                    CreateToken(x + 1, y);
                 else
-                    createToken(x, y);
+                    CreateToken(x, y);
             }
         }
-        findMoves();
+        FindMoves();
     }
 
     //Create a token at x,y
-    private void createToken(int x, int y)
+    private void CreateToken(int x, int y)
     {
         GameObject go;
-        go = Instantiate(whiteTokenPrefab) as GameObject;
-        go.transform.SetParent(transform);
+        go = Instantiate(whiteTokenPrefab, transform, true);
         Token t = go.GetComponent<Token>();
         t.setX(x);
         t.setY(y);
@@ -157,7 +155,7 @@ public class Board : MonoBehaviour
         {
             if (t.getSide() == "player")
             {
-                clearHighlights();
+                ClearHighlights();
                 selected = t;
                 return true;
             }
@@ -166,7 +164,7 @@ public class Board : MonoBehaviour
     }
 
     //Move the selected token to x,y
-    private void moveToken(Token t, int x, int y)
+    private void MoveToken(Token t, int x, int y)
     {
         t.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + tokenOffset;
 
@@ -180,22 +178,21 @@ public class Board : MonoBehaviour
 
 
     //Display all possible moves of selected token
-    private void displayMoves()
+    private void DisplayMoves()
     {
         List<Move> moves = selected.getMoves();
         Debug.Log("Number of moves "+moves.Count);
         for (int i = 0; i< moves.Count; i++)
         {
-            createHighlight(moves[i].getX(), moves[i].getY());
+            CreateHighlight(moves[i].getX(), moves[i].getY());
         }
     }
 
     //Create highlighted tiles at x,y
-    private void createHighlight(int x, int y)
+    private void CreateHighlight(int x, int y)
     {
         GameObject go;
-        go = Instantiate(highlightPrefab) as GameObject;
-        go.transform.SetParent(transform);
+        go = Instantiate(highlightPrefab, transform, true);
         Move h = go.GetComponent<Move>();
         h.setX(x);
         h.setY(y);
@@ -206,7 +203,7 @@ public class Board : MonoBehaviour
     }
 
     //Clear highlighted tiles
-    private void clearHighlights()
+    private void ClearHighlights()
     {
         for (int i = 0; i<highlights.Count; i++)
         {
@@ -217,7 +214,7 @@ public class Board : MonoBehaviour
 
 
     //Find all possible moves for all token and store in the class
-    private void findMoves()
+    private void FindMoves()
     {
         for (int i = 0; i<8; i++)
         {
@@ -230,22 +227,22 @@ public class Board : MonoBehaviour
                     if (t.getKing())
                     {
                         //move backwards if the token is a king
-                        if (checkMove(i - 1, j - 1) == 0)
+                        if (CheckMove(i - 1, j - 1) == 0)
                         {
                             t.addMove(new Move(i - 1, j - 1));
                         }
-                        if (checkMove(i + 1, j - 1) == 0)
+                        if (CheckMove(i + 1, j - 1) == 0)
                         {
                             t.addMove(new Move(i + 1, j - 1));
                         }
                     }
 
                     //move forwards
-                    if (checkMove(i - 1, j + 1) == 0)
+                    if (CheckMove(i - 1, j + 1) == 0)
                     {
                         t.addMove(new Move(i - 1, j + 1));
                     }
-                    if (checkMove(i + 1, j + 1) == 0)
+                    if (CheckMove(i + 1, j + 1) == 0)
                     {
                         t.addMove(new Move(i + 1, j + 1));
                     }
@@ -257,11 +254,11 @@ public class Board : MonoBehaviour
 
     //Check if token is able to be moved to x,y
     //Improve this to account for capturing pieces and multiple captures
-    private int checkMove(int x, int y)
+    private int CheckMove(int x, int y)
     {
         if (x < 0 || x > 7 || y < 0 || y > 7)
             return -1;
-        else if (tokens[x,y] != null)
+        if (tokens[x,y] != null)
         {
             if (tokens[x, y].getSide() == "opponent")
             {
@@ -273,7 +270,7 @@ public class Board : MonoBehaviour
     }
 
     //Display the current board layout in console
-    private void debugBoard()
+    private void DebugBoard()
     {
         string str = "";
         for (int j = 7; j >= 0; j--) 
