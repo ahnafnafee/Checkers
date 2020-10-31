@@ -1,9 +1,7 @@
 name: Build
 
 on:
-  push:
-    tags:
-      - '*'
+  push: { branches: [master] }
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
