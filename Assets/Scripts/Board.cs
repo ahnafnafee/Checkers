@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class Board : MonoBehaviour
+public class Board : NetworkBehaviour
 {
     public GameObject highlightPrefab;
     public GameObject whitePiecePrefab;
@@ -25,8 +26,27 @@ public class Board : MonoBehaviour
         List<Move> test = new List<Move>();
     }
 
-    // Update is called once per frame
+    [Client]
     void Update()
+    {
+        // if (!hasAuthority)
+        // {
+        //     Debug.Log("NO AUTH");
+        //     return;
+        // }
+
+        CmdMovePiece();
+
+    }
+
+    [Command]
+    private void CmdMovePiece()
+    {
+        RpcMove();
+    }
+    
+    [ClientRpc]
+    private void RpcMove()
     {
         UpdateMouseOver();
 
@@ -173,6 +193,7 @@ public class Board : MonoBehaviour
     /// move contains the destination x,y and pieces to capture
     ///
     //Move the selected piece to x,y 
+
     private void MovePiece(Piece p, Move move)
     {
         int x = move.getX();
