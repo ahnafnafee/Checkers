@@ -2,32 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Move : MonoBehaviour
+public class Move : Square
 {
-    private int x;
-    private int y;
+    private List<Square> captures = new List<Square>();
+    private int priority = 0;
 
-    public Move(int x, int y)
+    public List<Square> getCaptures()
     {
-        this.x = x;
-        this.y = y;
+        return captures;
     }
+    public void addCapture(Square piece)
+    {
+        captures.Add(piece);
+    }
+    public int getPriority()
+    {
+        return priority;
+    }
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
+    
+    
 
-    public int getX()
-    {
-        return x;
-    }
-    public void setX(int x)
-    {
-        this.x = x;
-    }
-    public int getY()
-    {
-        return y;
-    }
-    public void setY(int y)
-    {
-        this.y = y;
-    }
 
 }

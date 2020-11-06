@@ -92,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8659051625264144253}
   - component: {fileID: 8659051625264144252}
-  - component: {fileID: 5519800713714556743}
+  - component: {fileID: -5900953239924404372}
   m_Layer: 0
   m_Name: DarkToken
   m_TagString: Untagged
@@ -167,7 +167,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5519800713714556743
+--- !u!114 &-5900953239924404372
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

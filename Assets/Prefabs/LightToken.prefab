@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4970993380596824220}
   - component: {fileID: 4970993380596824221}
-  - component: {fileID: 5546190751446953957}
+  - component: {fileID: 4676700396030275835}
   m_Layer: 0
   m_Name: LightToken
   m_TagString: Untagged
@@ -249,7 +249,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5546190751446953957
+--- !u!114 &4676700396030275835
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

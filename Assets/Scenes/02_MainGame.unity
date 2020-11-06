@@ -444,7 +444,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -26.6}
+  m_AnchoredPosition: {x: 0, y: -26.600006}
   m_SizeDelta: {x: 0, y: 94.000015}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &669011322
@@ -706,8 +706,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightPrefab: {fileID: 2799701355552364789, guid: 974686b571f83e54f81923c8e8dd173f, type: 3}
-  whiteTokenPrefab: {fileID: 4970993380596824222, guid: 255f6112750915d44a3f406a5934a3b4, type: 3}
-  blackTokenPrefab: {fileID: 8659051625264144255, guid: 884499c377b99854788f6e6566f6e704, type: 3}
+  whitePiecePrefab: {fileID: 4970993380596824222, guid: 255f6112750915d44a3f406a5934a3b4, type: 3}
+  blackPiecePrefab: {fileID: 8659051625264144255, guid: 884499c377b99854788f6e6566f6e704, type: 3}
 --- !u!212 &1090101257
 SpriteRenderer:
   m_ObjectHideFlags: 0

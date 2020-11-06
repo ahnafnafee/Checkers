@@ -3,16 +3,17 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    private Token[,] tokens = new Token[8, 8];
-    private Token selected;
     public GameObject highlightPrefab;
-    public GameObject whiteTokenPrefab;
-    public GameObject blackTokenPrefab;
+    public GameObject whitePiecePrefab;
+    public GameObject blackPiecePrefab;
 
-    private List<Move> highlights = new List<Move>();
+    private Piece[,] pieces = new Piece[8, 8]; //Grid
+    private Piece selected; //Selected piece (null if none selected)
+
+    private List<Move> highlights = new List<Move>(); //List of all possible moves
 
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-    private Vector2 tokenOffset = new Vector2(0.5f, 0.5f);
+    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
     private Vector2 mouseOver;
 
@@ -29,68 +30,44 @@ public class Board : MonoBehaviour
 
         int x = (int)mouseOver.x;
         int y = (int)mouseOver.y;
-        
+
         if (Input.GetMouseButtonDown(0))
         {
-            if (selected == null) {
-                if (SelectToken(x, y))
-                {
-                    Debug.Log("Selected " + x + " " + y);
-                    if (selected.getMovesNum() > 0)
-                    {
-                        selected.select(true);
-                        DisplayMoves();
-                    }
-                }
+            if (selected == null) { //No pieces are selected
+                SelectPiece(x, y);
             }
-            else
+            else //A piece is already selected
             {
-                selected.select(false);
-                if (SelectToken(x, y))
+                selected.select(false); 
+                if (!SelectPiece(x, y)) //If not selecting another piece
                 {
-                    Debug.Log("Selected " + x + " " + y);
-                    if (selected.getMovesNum() > 0)
+                    Move selectedMove = CheckValid(x, y);
+                    if (selectedMove != null)
                     {
-                        selected.select(true);
-                        DisplayMoves();
+                        Piece p = pieces[selected.getX(), selected.getY()];
+                        Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
+                        MovePiece(p, selectedMove);
+
+                        if (y == 7)//Promote the piece
+                            p.promote();
                     }
-                }
-                else
-                { 
-                Token t = tokens[selected.getX(), selected.getY()];
-                
-                
-                if (CheckValid(x, y))
-                {
-                    MoveToken(t, x, y);
-                    if (y == 7)
-                    {
-                        t.promote();
-                    }
-                    FindMoves();
-                    Debug.Log("Moved token");
-                }
-
-
-
-                selected = null;
-                ClearHighlights();
+                    //After moving the piece
+                    ClearHighlights();
                 }
             }
             DebugBoard();
         }
-
     }
 
-    //Check if the selected move is in the list of valid moves for the selected token
-    private bool CheckValid(int x, int y)
+    //Check if the selected move is in the list of valid moves for the selected piece
+    private Move CheckValid(int x, int y)
     {
-        for (int i = 0; i< highlights.Count; i++)
+        for (int i = 0; i < highlights.Count; i++)
         {
-            if( highlights[i].getX() == x && highlights[i].getY() == y)
-                return true;
+            if (highlights[i].getX() == x && highlights[i].getY() == y)
+                return highlights[i];
         }
-        return false;
+        return null;
     }
 
     //Get mouse location
@@ -115,80 +92,129 @@ public class Board : MonoBehaviour
         }
     }
 
-    //Create all tokens
+    //Create all pieces
     private void CreateBoard()
     {
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 8; x += 2)
-            {
-                if (y % 2 == 1)
-                    CreateToken(x + 1, y);
-                else
-                    CreateToken(x, y);
-            }
+                CreatePiece(x + y % 2, y, "player");
         }
-        FindMoves();
+
+        CreatePiece(1 , 3, "opponent");
+        CreatePiece(3 , 5, "opponent");
+
+        /*for (int y = 5; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x += 2)
+                CreatePiece(x + y % 2, y, "opponent");
+        }*/
     }
 
-    //Create a token at x,y
-    private void CreateToken(int x, int y)
+    //Create a piece at x,y
+    private void CreatePiece(int x, int y, string side)
     {
         GameObject go;
-        go = Instantiate(whiteTokenPrefab, transform, true);
-        Token t = go.GetComponent<Token>();
-        t.setX(x);
-        t.setY(y);
-        t.setSide("player");
-        tokens[x, y] = t;
 
-        t.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + tokenOffset;
+        //Change to check side ////////Need a method to change the prefab assigned to each player
+        if (side == "player")
+            go = Instantiate(whitePiecePrefab, transform, true);
+        else
+            go = Instantiate(blackPiecePrefab, transform, true);
+        Piece p = go.GetComponent<Piece>();
+        p.setX(x);
+        p.setY(y);
+        p.setSide(side);
+        pieces[x, y] = p;
+
+        MoveGameObject(p, x, y);
     }
 
-    //Select the token return true if a token is selected
-    private bool SelectToken(int x, int y)
+    //Select the piece return true if a piece is selected
+    private bool SelectPiece(int x, int y)
     {
         if (x < 0 || x > 7 || y < 0 || y > 7)
             return false;
-        Token t = tokens[x, y];
-        if (t != null)
+        Piece p = pieces[x, y];
+        if (p != null) //if the selected square contains a piece
         {
-            if (t.getSide() == "player")
+            if (p.getSide() == "player") //if the player owns the piece
             {
                 ClearHighlights();
-                selected = t;
-                return true;
+                selected = p;
+
+                Debug.Log("Selected " + x + " " + y);
+
+                FindMoves();
+
+                if (highlights.Count > 0) //highlight piece if move is possible
+                {
+                    selected.select(true);
+                    return true;
+                }
+                else //deselect piece if piece has no possible moves
+                {
+                    selected.select(false);
+                    selected = null;
+                    return false;
+                }
             }
         }
         return false;
     }
 
-    //Move the selected token to x,y
-    private void MoveToken(Token t, int x, int y)
+    ///
+    /// Send this message to server 
+    /// p contains selected piece
+    /// move contains the destination x,y and pieces to capture
+    ///
+    //Move the selected piece to x,y 
+    private void MovePiece(Piece p, Move move)
     {
-        t.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + tokenOffset;
+        int x = move.getX();
+        int y = move.getY();
 
-        tokens[selected.getX(), selected.getY()] = null; 
-
-        selected.setX(x);
-        selected.setY(y);
-        tokens[x, y] = selected;
+        pieces[p.getX(), p.getY()] = null;
+        p.setX(x);
+        p.setY(y);
+        pieces[x, y] = p;
         selected = null;
+
+        bool multiCapture = false;
+        List<Square> captures = move.getCaptures();
+        for (int i = 0; i < captures.Count; i++)
+        {
+            int cX = captures[i].getX();
+            int cY = captures[i].getY();
+            Destroy(pieces[cX, cY].gameObject);
+            multiCapture = true;
+        }
+        /*if (multiCapture)
+        {
+            SelectPiece(x, y);
+        }*/
+
+
+        MoveGameObject(p, x, y);
+    }
+
+    private void MoveGameObject(Square go, int x, int y)
+    {
+        go.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + pieceOffset;
     }
 
 
-    //Display all possible moves of selected token
+    //Display all possible moves of selected piece
     private void DisplayMoves()
     {
-        List<Move> moves = selected.getMoves();
-        Debug.Log("Number of moves "+moves.Count);
-        for (int i = 0; i< moves.Count; i++)
+        Debug.Log("Number of moves " + highlights.Count);
+        for (int i = 0; i < highlights.Count; i++)
         {
-            CreateHighlight(moves[i].getX(), moves[i].getY());
+            CreateHighlight(highlights[i].getX(), highlights[i].getY());
         }
     }
 
-    //Create highlighted tiles at x,y
+    //Create highlighted squares at x,y
     private void CreateHighlight(int x, int y)
     {
         GameObject go;
@@ -196,16 +222,30 @@ public class Board : MonoBehaviour
         Move h = go.GetComponent<Move>();
         h.setX(x);
         h.setY(y);
-        
+
         highlights.Add(h);
 
-        h.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + tokenOffset;
+        MoveGameObject(h, x, y);
     }
 
-    //Clear highlighted tiles
+    //Create highlighted squares at x,y
+    private void CreateHighlight2(int x, int y, int captureX, int captureY)
+    {
+        GameObject go;
+        go = Instantiate(highlightPrefab, transform, true);
+        Move h = go.GetComponent<Move>();
+        h.setX(x);
+        h.setY(y);
+        h.addCapture(pieces[captureX, captureY]);
+        highlights.Add(h);
+
+        MoveGameObject(h, x, y);
+    }
+
+    //Clear highlighted squares
     private void ClearHighlights()
     {
-        for (int i = 0; i<highlights.Count; i++)
+        for (int i = 0; i < highlights.Count; i++)
         {
             Destroy(highlights[i].gameObject);
         }
@@ -213,72 +253,76 @@ public class Board : MonoBehaviour
     }
 
 
-    //Find all possible moves for all token and store in the class
-    private void FindMoves()
+    //Find all possible moves for the selected piece
+    private void FindMoves() //Change to accept one piece
     {
-        for (int i = 0; i<8; i++)
+        if (selected != null)
         {
-            for (int j = 0; j<8; j++)
+            int x = selected.getX();
+            int y = selected.getY();
+
+            int UR = 1;
+            int DL = -1;
+
+
+            //////////////////////////
+            //REWRITE THIS PART
+            ///////////////////////
+            //move forwards
+            //Up Left
+            if (CheckSquare(x - 1, y + UR) == 0)
+                CreateHighlight(x - 1, y + 1);
+            else if (CheckSquare(x - 1, y + 1) == 1 && CheckSquare(x - 2, y + 2) == 0)
+                CreateHighlight2(x - 2, y + 2, x - 1, y + 1);
+
+            //Up Right
+            if (CheckSquare(x + 1, y + 1) == 0)
+                CreateHighlight(x + 1, y + 1);
+            else if (CheckSquare(x + 1, y + 1) == 1 && CheckSquare(x + 2, y + 2) == 0)
+                CreateHighlight2(x + 2, y + 2, x + 1, y + 1);
+
+
+            if (selected.getKing())
             {
-                Token t = tokens[i, j];
-                if (t != null)
-                {
-                    t.clearMoves();
-                    if (t.getKing())
-                    {
-                        //move backwards if the token is a king
-                        if (CheckMove(i - 1, j - 1) == 0)
-                        {
-                            t.addMove(new Move(i - 1, j - 1));
-                        }
-                        if (CheckMove(i + 1, j - 1) == 0)
-                        {
-                            t.addMove(new Move(i + 1, j - 1));
-                        }
-                    }
+                //move backwards if the piece is a king
+                if (CheckSquare(x - 1, y - 1) == 0)
+                    CreateHighlight(x - 1, y - 1);
+                else if (CheckSquare(x - 1, y - 1) == 1 && CheckSquare(x - 2, y - 2) == 0)
+                    CreateHighlight2(x - 2, y - 2, x - 1, y - 1);
 
-                    //move forwards
-                    if (CheckMove(i - 1, j + 1) == 0)
-                    {
-                        t.addMove(new Move(i - 1, j + 1));
-                    }
-                    if (CheckMove(i + 1, j + 1) == 0)
-                    {
-                        t.addMove(new Move(i + 1, j + 1));
-                    }
-
-                }
+                if (CheckSquare(x + 1, y - 1) == 0)
+                    CreateHighlight(x + 1, y - 1);
+                else if (CheckSquare(x + 1, y - 1) == 1 && CheckSquare(x + 2, y - 2) == 0)
+                    CreateHighlight2(x + 2, y - 2, x + 1, y - 1);
             }
+
+
+            //Remove moves with lower prioriy
         }
     }
 
-    //Check if token is able to be moved to x,y
-    //Improve this to account for capturing pieces and multiple captures
-    private int CheckMove(int x, int y)
+    //Check what is on square at (x,y)
+    private int CheckSquare(int x, int y)
     {
-        if (x < 0 || x > 7 || y < 0 || y > 7)
+        if (x < 0 || x > 7 || y < 0 || y > 7) //out of board
             return -1;
-        if (tokens[x,y] != null)
-        {
-            if (tokens[x, y].getSide() == "opponent")
-            {
-                return 1;
-            }
+        if (pieces[x, y] == null) //no piece
+            return 0;
+        if (pieces[x, y].getSide() == "player") //player's piece
             return -1;
-        }
-        return 0;
+        return 1; //opponent's piece
     }
 
     //Display the current board layout in console
     private void DebugBoard()
     {
         string str = "";
-        for (int j = 7; j >= 0; j--) 
+        for (int j = 7; j >= 0; j--)
         {
             for (int i = 0; i < 8; i++)
             {
-                if (tokens[i, j] != null)
-                    str += "T";
+                if (pieces[i, j] != null)
+                    str += "P";
                 else
                     str += "O";
             }
@@ -286,5 +330,4 @@ public class Board : MonoBehaviour
         }
         Debug.Log(str);
     }
-
 }
