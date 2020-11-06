@@ -24,28 +24,11 @@ public class Board : MonoBehaviour
         CreateBoard();
         //Set player1 and player2 color
         List<Move> test = new List<Move>();
+        
+        
     }
 
     void Update()
-    {
-        // if (!hasAuthority)
-        // {
-        //     Debug.Log("NO AUTH");
-        //     return;
-        // }
-
-        CmdMovePiece();
-
-    }
-
-    [Command]
-    private void CmdMovePiece()
-    {
-        RpcMove();
-    }
-    
-    [ClientRpc]
-    private void RpcMove()
     {
         UpdateMouseOver();
 
@@ -54,15 +37,17 @@ public class Board : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (selected == null) { //No pieces are selected
+            if (selected == null)
+            {
+                //No pieces are selected
                 SelectPiece(x, y);
             }
             else //A piece is already selected
             {
-                selected.select(false); 
+                selected.select(false);
                 if (!SelectPiece(x, y)) //If not selecting another piece
                 {
-                    
+
                     Move selectedMove = CheckValid(x, y);
                     if (selectedMove != null)
                     {
@@ -70,17 +55,21 @@ public class Board : MonoBehaviour
                         Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
                         MovePiece(p, selectedMove);
 
-                        if (y == 7)//Promote the piece
+                        if (y == 7) //Promote the piece
                             p.promote();
                     }
+
                     //After moving the piece
                     ClearHighlights();
                     FindMoves();
                 }
             }
+
             DebugBoard();
         }
+
     }
+
 
     //Check if the selected move is in the list of valid moves for the selected piece
     private Move CheckValid(int x, int y)

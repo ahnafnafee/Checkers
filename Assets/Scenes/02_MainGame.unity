@@ -803,7 +803,6 @@ GameObject:
   - component: {fileID: 1090101254}
   - component: {fileID: 1090101256}
   - component: {fileID: 1090101255}
-  - component: {fileID: 1090101257}
   m_Layer: 8
   m_Name: Board
   m_TagString: Untagged
@@ -851,27 +850,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 561fa8fb92030f24e8590ef71bd899fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   highlightPrefab: {fileID: 2799701355552364789, guid: 974686b571f83e54f81923c8e8dd173f, type: 3}
   whitePiecePrefab: {fileID: 4970993380596824222, guid: 255f6112750915d44a3f406a5934a3b4, type: 3}
   blackPiecePrefab: {fileID: 8659051625264144255, guid: 884499c377b99854788f6e6566f6e704, type: 3}
---- !u!114 &1090101257
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1090101253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 762861704
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!1 &1111764741
 GameObject:
   m_ObjectHideFlags: 0

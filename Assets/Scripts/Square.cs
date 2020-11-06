@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class Square : NetworkBehaviour
+public class Square : MonoBehaviour
 {
     protected int x;
     protected int y;
