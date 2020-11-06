@@ -7,6 +7,7 @@ public class Piece : Square
     private string side;
     private bool king = false;
     private List<Move> moves = new List<Move>();
+    private int priority = 0;
 
     public string getSide()
     {
@@ -36,13 +37,19 @@ public class Piece : Square
     }
     public void addMove(Move move)
     {
-        moves.Add(move);
-
-        //remove lower priority moves
+        int prio = move.getPriority();
+        if (prio > priority) //Force capture
+        {
+            moves.Clear();
+            priority = prio;
+        }
+        if (prio >= priority) 
+            moves.Add(move);
     }
     public void clearMoves()
     {
         moves.Clear();
+        priority = 0;
     }
     public int getMovesNum()
     {

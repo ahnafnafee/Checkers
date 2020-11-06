@@ -23,7 +23,6 @@ public class Board : MonoBehaviour
         CreateBoard();
         //Set player1 and player2 color
         List<Move> test = new List<Move>();
-
     }
 
     // Update is called once per frame
@@ -178,7 +177,6 @@ public class Board : MonoBehaviour
     {
         int x = move.getX();
         int y = move.getY();
-        Debug.Log(move);
         pieces[p.getX(), p.getY()] = null;
         p.setX(x);
         p.setY(y);
