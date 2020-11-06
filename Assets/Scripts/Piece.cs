@@ -6,6 +6,7 @@ public class Piece : Square
 {
     private string side;
     private bool king = false;
+    private List<Move> moves = new List<Move>();
 
     public string getSide()
     {
@@ -28,5 +29,25 @@ public class Piece : Square
     {
         gameObject.transform.Find("selected").gameObject.SetActive(select);
     }
+
+    public List<Move> getMoves()
+    {
+        return moves;
+    }
+    public void addMove(Move move)
+    {
+        moves.Add(move);
+
+        //remove lower priority moves
+    }
+    public void clearMoves()
+    {
+        moves.Clear();
+    }
+    public int getMovesNum()
+    {
+        return moves.Count;
+    }
+
 
 }

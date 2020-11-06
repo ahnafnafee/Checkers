@@ -15,6 +15,10 @@ public class Move : Square
     {
         captures.Add(piece);
     }
+    public void setCapture(List<Square> pieces)
+    {
+        captures = pieces;
+    }
     public int getPriority()
     {
         return priority;

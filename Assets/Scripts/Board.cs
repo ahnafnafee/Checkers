@@ -21,6 +21,9 @@ public class Board : MonoBehaviour
     void Start()
     {
         CreateBoard();
+        //Set player1 and player2 color
+        List<Move> test = new List<Move>();
+
     }
 
     // Update is called once per frame
@@ -41,6 +44,7 @@ public class Board : MonoBehaviour
                 selected.select(false); 
                 if (!SelectPiece(x, y)) //If not selecting another piece
                 {
+                    
                     Move selectedMove = CheckValid(x, y);
                     if (selectedMove != null)
                     {
@@ -53,6 +57,7 @@ public class Board : MonoBehaviour
                     }
                     //After moving the piece
                     ClearHighlights();
+                    FindMoves();
                 }
             }
             DebugBoard();
@@ -109,6 +114,8 @@ public class Board : MonoBehaviour
             for (int x = 0; x < 8; x += 2)
                 CreatePiece(x + y % 2, y, "opponent");
         }*/
+
+        FindMoves();
     }
 
     //Create a piece at x,y
@@ -136,31 +143,29 @@ public class Board : MonoBehaviour
         if (x < 0 || x > 7 || y < 0 || y > 7)
             return false;
         Piece p = pieces[x, y];
-        if (p != null) //if the selected square contains a piece
+        if (p == null) //if the selected square contains a piece
+            return false;
+        if (p.getSide() == "opponent") //if not the player's piece
+            return false;
+
+        ClearHighlights();
+        
+        Debug.Log("Selected " + x + " " + y);
+
+        selected = p;
+
+        if (selected.getMovesNum() > 0) //highlight piece if move is possible
         {
-            if (p.getSide() == "player") //if the player owns the piece
-            {
-                ClearHighlights();
-                selected = p;
-
-                Debug.Log("Selected " + x + " " + y);
-
-                FindMoves();
-
-                if (highlights.Count > 0) //highlight piece if move is possible
-                {
-                    selected.select(true);
-                    return true;
-                }
-                else //deselect piece if piece has no possible moves
-                {
-                    selected.select(false);
-                    selected = null;
-                    return false;
-                }
-            }
+            selected.select(true);
+            DisplayMoves();
+            return true;
         }
-        return false;
+        else //deselect piece if piece has no possible moves
+        {
+            selected.select(false);
+            selected = null;
+            return false;
+        }
     }
 
     ///
@@ -173,7 +178,7 @@ public class Board : MonoBehaviour
     {
         int x = move.getX();
         int y = move.getY();
-
+        Debug.Log(move);
         pieces[p.getX(), p.getY()] = null;
         p.setX(x);
         p.setY(y);
@@ -182,20 +187,22 @@ public class Board : MonoBehaviour
 
         bool multiCapture = false;
         List<Square> captures = move.getCaptures();
+        Debug.Log("Cap num "+ x + " " + y +" "+captures.Count);
         for (int i = 0; i < captures.Count; i++)
         {
             int cX = captures[i].getX();
             int cY = captures[i].getY();
-            Destroy(pieces[cX, cY].gameObject);
+            Destroy(pieces[cX,cY].gameObject);
             multiCapture = true;
         }
+        MoveGameObject(p, x, y);
+
         /*if (multiCapture)
         {
             SelectPiece(x, y);
         }*/
+        //Select and find moves again if a capturing move is available let player move again if not end turn
 
-
-        MoveGameObject(p, x, y);
     }
 
     private void MoveGameObject(Square go, int x, int y)
@@ -207,39 +214,22 @@ public class Board : MonoBehaviour
     //Display all possible moves of selected piece
     private void DisplayMoves()
     {
-        Debug.Log("Number of moves " + highlights.Count);
-        for (int i = 0; i < highlights.Count; i++)
+        List<Move> moves = selected.getMoves();
+        for (int i = 0; i < selected.getMovesNum(); i++)
         {
-            CreateHighlight(highlights[i].getX(), highlights[i].getY());
+            GameObject go = Instantiate(highlightPrefab, transform, true);
+            Move h = go.GetComponent<Move>();
+
+            int x = moves[i].getX();
+            int y = moves[i].getY();
+            List<Square> captures = moves[i].getCaptures();
+            h.setX(x);
+            h.setY(y);
+            h.setCapture(captures);
+            highlights.Add(h);
+
+            MoveGameObject(h, x, y);
         }
-    }
-
-    //Create highlighted squares at x,y
-    private void CreateHighlight(int x, int y)
-    {
-        GameObject go;
-        go = Instantiate(highlightPrefab, transform, true);
-        Move h = go.GetComponent<Move>();
-        h.setX(x);
-        h.setY(y);
-
-        highlights.Add(h);
-
-        MoveGameObject(h, x, y);
-    }
-
-    //Create highlighted squares at x,y
-    private void CreateHighlight2(int x, int y, int captureX, int captureY)
-    {
-        GameObject go;
-        go = Instantiate(highlightPrefab, transform, true);
-        Move h = go.GetComponent<Move>();
-        h.setX(x);
-        h.setY(y);
-        h.addCapture(pieces[captureX, captureY]);
-        highlights.Add(h);
-
-        MoveGameObject(h, x, y);
     }
 
     //Clear highlighted squares
@@ -253,51 +243,57 @@ public class Board : MonoBehaviour
     }
 
 
-    //Find all possible moves for the selected piece
-    private void FindMoves() //Change to accept one piece
+    //Find all possible moves for all pieces
+    private void FindMoves()
     {
-        if (selected != null)
+        for (int i = 0; i < 8; i++)
         {
-            int x = selected.getX();
-            int y = selected.getY();
-
-            int UR = 1;
-            int DL = -1;
-
-
-            //////////////////////////
-            //REWRITE THIS PART
-            ///////////////////////
-            //move forwards
-            //Up Left
-            if (CheckSquare(x - 1, y + UR) == 0)
-                CreateHighlight(x - 1, y + 1);
-            else if (CheckSquare(x - 1, y + 1) == 1 && CheckSquare(x - 2, y + 2) == 0)
-                CreateHighlight2(x - 2, y + 2, x - 1, y + 1);
-
-            //Up Right
-            if (CheckSquare(x + 1, y + 1) == 0)
-                CreateHighlight(x + 1, y + 1);
-            else if (CheckSquare(x + 1, y + 1) == 1 && CheckSquare(x + 2, y + 2) == 0)
-                CreateHighlight2(x + 2, y + 2, x + 1, y + 1);
-
-
-            if (selected.getKing())
+            for (int j = 0; j < 8; j++)
             {
-                //move backwards if the piece is a king
-                if (CheckSquare(x - 1, y - 1) == 0)
-                    CreateHighlight(x - 1, y - 1);
-                else if (CheckSquare(x - 1, y - 1) == 1 && CheckSquare(x - 2, y - 2) == 0)
-                    CreateHighlight2(x - 2, y - 2, x - 1, y - 1);
+                Piece p = pieces[i, j];
+                if (p != null)
+                {
 
-                if (CheckSquare(x + 1, y - 1) == 0)
-                    CreateHighlight(x + 1, y - 1);
-                else if (CheckSquare(x + 1, y - 1) == 1 && CheckSquare(x + 2, y - 2) == 0)
-                    CreateHighlight2(x + 2, y - 2, x + 1, y - 1);
+                    p.clearMoves();
+
+                    //move forwards
+                    CheckDirection(p, i, j, -1, 1);
+                    CheckDirection(p, i, j, 1, 1);
+
+                    if (p.getKing())
+                    {
+                        //move backwards if the piece is a king
+                        CheckDirection(p, i, j, -1, -1);
+                        CheckDirection(p, i, j, 1, -1);
+                    }
+                    
+                }
+                
             }
+            //Remove moves with lower prioriy to force capturing
+        }
+    }
 
+    private void CheckDirection(Piece p, int x, int y, int dx, int dy)
+    {
+        Move m = new Move();
+        int adjSquare = CheckSquare(x + dx, y + dy);
+        int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
-            //Remove moves with lower prioriy
+        if (adjSquare == 0)
+        {
+            m.setX(x + dx);
+            m.setY(y + dy);
+            m.setPriority(0);
+            p.addMove(m);
+        }
+        else if (adjSquare == 1 && jumpSquare == 0)
+        {
+            m.setX(x + 2 * dx);
+            m.setY(y + 2 * dy);
+            m.setPriority(1);
+            m.addCapture(pieces[x + dx, y + dy]);
+            p.addMove(m);
         }
     }
 
