@@ -403,6 +403,8 @@ MonoBehaviour:
   menuScene: Assets/Scenes/01_Lobby.unity
   roomPlayerPrefab: {fileID: 5494571419773178487, guid: 255bd50c0b57afc4489a3dad8dd9d0a7, type: 3}
   gamePlayerPrefab: {fileID: 2155515660328231840, guid: 39a680b438da1d040b4fd448bbe900c6, type: 3}
+  playerSpawnSystem: {fileID: 3306915131276285084, guid: 177bbc0659164004490816c278162780, type: 3}
+  roundSystem: {fileID: 0}
 --- !u!4 &1495594496
 Transform:
   m_ObjectHideFlags: 0
