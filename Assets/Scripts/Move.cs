@@ -19,16 +19,13 @@ public class Move : Square
     {
         captures = pieces;
     }
-    public int getPriority()
+    
+    public int GetPriority()
     {
         return priority;
     }
-    public void setPriority(int priority)
+    public void SetPriority(int priority)
     {
         this.priority = priority;
     }
-    
-    
-
-
 }

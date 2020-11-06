@@ -7,6 +7,8 @@ public class Board : MonoBehaviour
     public GameObject highlightPrefab;
     public GameObject whitePiecePrefab;
     public GameObject blackPiecePrefab;
+    public GameObject square;
+    public GameObject move;
 
     private Piece[,] pieces = new Piece[8, 8]; //Grid
     private Piece selected; //Selected piece (null if none selected)
@@ -23,9 +25,6 @@ public class Board : MonoBehaviour
     {
         CreateBoard();
         //Set player1 and player2 color
-        List<Move> test = new List<Move>();
-        
-        
     }
 
     void Update()
@@ -39,6 +38,7 @@ public class Board : MonoBehaviour
         {
             if (selected == null)
             {
+                FindMoves();
                 //No pieces are selected
                 SelectPiece(x, y);
             }
@@ -61,7 +61,6 @@ public class Board : MonoBehaviour
 
                     //After moving the piece
                     ClearHighlights();
-                    FindMoves();
                 }
             }
 
@@ -113,14 +112,14 @@ public class Board : MonoBehaviour
                 CreatePiece(x + y % 2, y, "player");
         }
 
-        CreatePiece(1 , 3, "opponent");
-        CreatePiece(3 , 5, "opponent");
+        //CreatePiece(1 , 3, "opponent");
+        //CreatePiece(3 , 5, "opponent");
 
-        /*for (int y = 5; y < 8; y++)
+        for (int y = 5; y < 8; y++)
         {
             for (int x = 0; x < 8; x += 2)
                 CreatePiece(x + y % 2, y, "opponent");
-        }*/
+        }
 
         FindMoves();
     }
@@ -136,12 +135,11 @@ public class Board : MonoBehaviour
         else
             go = Instantiate(blackPiecePrefab, transform, true);
         Piece p = go.GetComponent<Piece>();
-        p.setX(x);
-        p.setY(y);
+        p.move(x,y);
         p.setSide(side);
         pieces[x, y] = p;
 
-        MoveGameObject(p, x, y);
+        //MoveGameObject(p, x, y);
     }
 
     //Select the piece return true if a piece is selected
@@ -187,8 +185,7 @@ public class Board : MonoBehaviour
         int x = move.getX();
         int y = move.getY();
         pieces[p.getX(), p.getY()] = null;
-        p.setX(x);
-        p.setY(y);
+        p.move(x,y);
         pieces[x, y] = p;
         selected = null;
 
@@ -197,12 +194,10 @@ public class Board : MonoBehaviour
         Debug.Log("Cap num "+ x + " " + y +" "+captures.Count);
         for (int i = 0; i < captures.Count; i++)
         {
-            int cX = captures[i].getX();
-            int cY = captures[i].getY();
-            Destroy(pieces[cX,cY].gameObject);
+            Destroy(captures[i].gameObject);
             multiCapture = true;
         }
-        MoveGameObject(p, x, y);
+        //MoveGameObject(p, x, y);
 
         /*if (multiCapture)
         {
@@ -211,11 +206,11 @@ public class Board : MonoBehaviour
         //Select and find moves again if a capturing move is available let player move again if not end turn
 
     }
-
+    /*
     private void MoveGameObject(Square go, int x, int y)
     {
         go.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + pieceOffset;
-    }
+    }*/
 
 
     //Display all possible moves of selected piece
@@ -230,12 +225,11 @@ public class Board : MonoBehaviour
             int x = moves[i].getX();
             int y = moves[i].getY();
             List<Square> captures = moves[i].getCaptures();
-            h.setX(x);
-            h.setY(y);
+            h.move(x,y);
             h.setCapture(captures);
             highlights.Add(h);
 
-            MoveGameObject(h, x, y);
+            //MoveGameObject(h, x, y);
         }
     }
 
@@ -281,24 +275,42 @@ public class Board : MonoBehaviour
         }
     }
 
+
+    private Square GetClasses(string c)
+    {
+        GameObject go = Instantiate(move, transform, true);
+        switch (c) {
+            case "Move":
+                return go.GetComponent<Move>();
+            case "Square":
+                return go.GetComponent<Square>();
+            case "White":
+                return go.GetComponent<Piece>();
+            case "Black":
+                return go.GetComponent<Piece>();
+            case "Highlight":
+                return go.GetComponent<Move>();
+            default:
+                return null;
+        }
+    }
+
     private void CheckDirection(Piece p, int x, int y, int dx, int dy)
     {
-        Move m = new Move();
+        Square m = GetClasses("Move");
         int adjSquare = CheckSquare(x + dx, y + dy);
         int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
         if (adjSquare == 0)
         {
-            m.setX(x + dx);
-            m.setY(y + dy);
-            m.setPriority(0);
+            m.move(x + dx, y + dy);
+            m.SetPriority(0);
             p.addMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0)
         {
-            m.setX(x + 2 * dx);
-            m.setY(y + 2 * dy);
-            m.setPriority(1);
+            m.move(x + 2 * dx, y + 2 * dy);
+            m.SetPriority(1);
             m.addCapture(pieces[x + dx, y + dy]);
             p.addMove(m);
         }

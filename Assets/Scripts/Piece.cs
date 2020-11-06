@@ -37,7 +37,7 @@ public class Piece : Square
     }
     public void addMove(Move move)
     {
-        int prio = move.getPriority();
+        int prio = move.GetPriority();
         if (prio > priority) //Force capture
         {
             moves.Clear();
