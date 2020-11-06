@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class Square : MonoBehaviour
+public class Square : NetworkBehaviour
 {
     protected int x;
     protected int y;

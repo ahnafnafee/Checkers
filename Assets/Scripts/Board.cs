@@ -2,7 +2,7 @@
 using Mirror;
 using UnityEngine;
 
-public class Board : NetworkBehaviour
+public class Board : MonoBehaviour
 {
     public GameObject highlightPrefab;
     public GameObject whitePiecePrefab;
@@ -26,7 +26,6 @@ public class Board : NetworkBehaviour
         List<Move> test = new List<Move>();
     }
 
-    [Client]
     void Update()
     {
         // if (!hasAuthority)
