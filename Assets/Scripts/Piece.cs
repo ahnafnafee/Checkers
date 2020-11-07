@@ -40,20 +40,32 @@ public class Piece : Square
         int prio = move.getPriority();
         if (prio > priority) //Force capture
         {
+            foreach (Move m in moves)
+                Destroy(m.gameObject);
             moves.Clear();
             priority = prio;
         }
-        if (prio >= priority) 
+        if (prio >= priority)
             moves.Add(move);
+        else
+            Destroy(move.gameObject);
     }
     public void clearMoves()
     {
+        foreach (Move move in moves)
+            Destroy(move.gameObject);
+
         moves.Clear();
         priority = 0;
     }
     public int getMovesNum()
     {
         return moves.Count;
+    }
+
+    public int getPriority()
+    {
+        return priority;
     }
 
 

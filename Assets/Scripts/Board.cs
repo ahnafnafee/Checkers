@@ -61,14 +61,18 @@ public class Board : MonoBehaviour
                         Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
                         MovePiece(p, selectedMove);
 
-                        if (y == 7) //Promote the piece
+                        //Promote the piece
+                        if ((p.getPlayer() == 1 && y == 7) ||
+                            (p.getPlayer() == 2 && y == 0)) 
                             p.promote();
+
+
+                        turn = (turn == 1) ? 2 : 1;
+                        Debug.Log("Turn " + turn);
                     }
 
                     //After moving the piece
                     ClearHighlights();
-                    turn = (turn == 1) ? 2 : 1;
-                    Debug.Log("Turn "+ turn);
                 }
             }
 
@@ -184,7 +188,6 @@ public class Board : MonoBehaviour
     /// move contains the destination x,y and pieces to capture
     ///
     //Move the selected piece to x,y 
-
     private void MovePiece(Piece p, Move move)
     {
         int x = move.getX();
@@ -211,12 +214,6 @@ public class Board : MonoBehaviour
         //Select and find moves again if a capturing move is available let player move again if not end turn
 
     }
-    /*
-    private void MoveGameObject(Square go, int x, int y)
-    {
-        go.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + pieceOffset;
-    }*/
-
 
     //Display all possible moves of selected piece
     private void DisplayMoves()
@@ -233,8 +230,6 @@ public class Board : MonoBehaviour
             h.move(x,y);
             h.setCapture(captures);
             highlights.Add(h);
-
-            //MoveGameObject(h, x, y);
         }
     }
 
@@ -248,10 +243,11 @@ public class Board : MonoBehaviour
         highlights.Clear();
     }
 
-
     //Find all possible moves for all pieces
     private void FindMoves()
     {
+        int priority = 0;
+        List<Piece> movablePieces = new List<Piece>();
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -259,13 +255,18 @@ public class Board : MonoBehaviour
                 Piece p = pieces[i, j];
                 if (p != null)
                 {
+                    p.clearMoves();
+
+                    int player = p.getPlayer();
+                    if (player != turn)
+                        continue;
                     int up = 1;
                     int dn = -1;
-                    if (p.getPlayer() == 2) {
+                    if (player == 2)
+                    {
                         up = -1;
                         dn = 1;
                     }
-                    p.clearMoves();
 
                     //move forwards
                     CheckDirection(p, i, j, dn, up);
@@ -278,10 +279,24 @@ public class Board : MonoBehaviour
                         CheckDirection(p, i, j, up, dn);
                     }
                     
+
+                    //If a capture move is available, keep only capture moves
+                    int prio = p.getPriority();
+                    if (prio > priority)
+                    {
+                        foreach (Piece piece in movablePieces)
+                            piece.clearMoves();
+
+                        movablePieces.Clear();
+                        priority = prio;
+                    }
+                    if (prio >= priority)
+                        movablePieces.Add(p);
+                    else
+                        p.clearMoves();
                 }
-                
             }
-            //Remove moves with lower prioriy to force capturing
+
         }
     }
 
@@ -299,11 +314,11 @@ public class Board : MonoBehaviour
         {
             case "Highlight":
                 go = Instantiate(highlightPrefab, transform, true);
-                go.transform.parent = transform.Find("TempObjects").transform;
+                go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
             default:
                 go = Instantiate(move, transform, true);
-                go.transform.parent = transform.Find("TempObjects").transform;
+                go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
         }
     }
@@ -327,6 +342,7 @@ public class Board : MonoBehaviour
         int adjSquare = CheckSquare(x + dx, y + dy);
         int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
+
         if (adjSquare == 0)
         {
             m.move(x + dx, y + dy);
@@ -339,6 +355,10 @@ public class Board : MonoBehaviour
             m.setPriority(1);
             m.addCapture(pieces[x + dx, y + dy]);
             p.addMove(m);
+        }
+        else
+        {
+            Destroy(m.gameObject);
         }
     }
 
