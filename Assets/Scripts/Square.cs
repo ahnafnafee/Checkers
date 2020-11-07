@@ -27,17 +27,4 @@ public class Square : MonoBehaviour
     }
 
 
-
-    public int GetPriority(){ return 0; }
-    public void SetPriority(int priority){}
-    public List<Square> getCaptures()
-    {
-        return new List<Square>;
-    }
-    public void addCapture(Square piece)
-    {
-    }
-    public void setCapture(List<Square> pieces)
-    {
-    }
 }

@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class Piece : Square
 {
-    private string side;
+    private int player;
     private bool king = false;
     private List<Move> moves = new List<Move>();
     private int priority = 0;
 
-    public string getSide()
+    public int getPlayer()
     {
-        return side;
+        return player;
     }
-    public void setSide(string side)
+    public void setPlayer(int player)
     {
-        this.side = side;
+        this.player = player;
     }
     public bool getKing()
     {
@@ -37,7 +37,7 @@ public class Piece : Square
     }
     public void addMove(Move move)
     {
-        int prio = move.GetPriority();
+        int prio = move.getPriority();
         if (prio > priority) //Force capture
         {
             moves.Clear();

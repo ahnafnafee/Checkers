@@ -20,6 +20,12 @@ public class Board : MonoBehaviour
 
     private Vector2 mouseOver;
 
+    private int turn = 1; //1 = player 1; 2 = player 2
+
+    //Change player color
+    private string player1Color = "White";
+    private string player2Color = "Black";
+
     // Start is called before the first frame update
     void Start()
     {
@@ -61,6 +67,8 @@ public class Board : MonoBehaviour
 
                     //After moving the piece
                     ClearHighlights();
+                    turn = (turn == 1) ? 2 : 1;
+                    Debug.Log("Turn "+ turn);
                 }
             }
 
@@ -109,7 +117,7 @@ public class Board : MonoBehaviour
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 8; x += 2)
-                CreatePiece(x + y % 2, y, "player");
+                CreatePiece(x + y % 2, y, 1);
         }
 
         //CreatePiece(1 , 3, "opponent");
@@ -118,25 +126,22 @@ public class Board : MonoBehaviour
         for (int y = 5; y < 8; y++)
         {
             for (int x = 0; x < 8; x += 2)
-                CreatePiece(x + y % 2, y, "opponent");
+                CreatePiece(x + y % 2, y, 2);
         }
 
         FindMoves();
     }
 
     //Create a piece at x,y
-    private void CreatePiece(int x, int y, string side)
+    private void CreatePiece(int x, int y, int player)
     {
-        GameObject go;
-
-        //Change to check side ////////Need a method to change the prefab assigned to each player
-        if (side == "player")
-            go = Instantiate(whitePiecePrefab, transform, true);
+        Piece p;
+        if (player == 1)
+            p = CreatePiecePrefab(player1Color);
         else
-            go = Instantiate(blackPiecePrefab, transform, true);
-        Piece p = go.GetComponent<Piece>();
+            p = CreatePiecePrefab(player2Color);
         p.move(x,y);
-        p.setSide(side);
+        p.setPlayer(player);
         pieces[x, y] = p;
 
         //MoveGameObject(p, x, y);
@@ -150,7 +155,7 @@ public class Board : MonoBehaviour
         Piece p = pieces[x, y];
         if (p == null) //if the selected square contains a piece
             return false;
-        if (p.getSide() == "opponent") //if not the player's piece
+        if (p.getPlayer() != turn) //if not the player's piece
             return false;
 
         ClearHighlights();
@@ -254,18 +259,23 @@ public class Board : MonoBehaviour
                 Piece p = pieces[i, j];
                 if (p != null)
                 {
-
+                    int up = 1;
+                    int dn = -1;
+                    if (p.getPlayer() == 2) {
+                        up = -1;
+                        dn = 1;
+                    }
                     p.clearMoves();
 
                     //move forwards
-                    CheckDirection(p, i, j, -1, 1);
-                    CheckDirection(p, i, j, 1, 1);
+                    CheckDirection(p, i, j, dn, up);
+                    CheckDirection(p, i, j, up, up);
 
                     if (p.getKing())
                     {
                         //move backwards if the piece is a king
-                        CheckDirection(p, i, j, -1, -1);
-                        CheckDirection(p, i, j, 1, -1);
+                        CheckDirection(p, i, j, dn, dn);
+                        CheckDirection(p, i, j, up, dn);
                     }
                     
                 }
@@ -276,41 +286,57 @@ public class Board : MonoBehaviour
     }
 
 
-    private Square GetClasses(string c)
+    private Square CreateSquarePrefab(string c)
     {
-        GameObject go = Instantiate(move, transform, true);
-        switch (c) {
-            case "Move":
-                return go.GetComponent<Move>();
-            case "Square":
-                return go.GetComponent<Square>();
-            case "White":
-                return go.GetComponent<Piece>();
-            case "Black":
-                return go.GetComponent<Piece>();
+        GameObject go = Instantiate(square, transform, true);
+        go.transform.parent = transform.Find("TempObjects").transform;
+        return go.GetComponent<Square>();
+    }
+    private Move CreateMovePrefab(string c)
+    {
+        GameObject go;
+        switch (c)
+        {
             case "Highlight":
+                go = Instantiate(highlightPrefab, transform, true);
+                go.transform.parent = transform.Find("TempObjects").transform;
                 return go.GetComponent<Move>();
             default:
-                return null;
+                go = Instantiate(move, transform, true);
+                go.transform.parent = transform.Find("TempObjects").transform;
+                return go.GetComponent<Move>();
+        }
+    }
+    private Piece CreatePiecePrefab(string c)
+    {
+        GameObject go;
+        switch (c)
+        {
+            case "White":
+                go = Instantiate(whitePiecePrefab, transform, true);
+                return go.GetComponent<Piece>();
+            default:
+                go = Instantiate(blackPiecePrefab, transform, true);
+                return go.GetComponent<Piece>();
         }
     }
 
     private void CheckDirection(Piece p, int x, int y, int dx, int dy)
     {
-        Square m = GetClasses("Move");
+        Move m = CreateMovePrefab("Move");
         int adjSquare = CheckSquare(x + dx, y + dy);
         int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
         if (adjSquare == 0)
         {
             m.move(x + dx, y + dy);
-            m.SetPriority(0);
+            m.setPriority(0);
             p.addMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0)
         {
             m.move(x + 2 * dx, y + 2 * dy);
-            m.SetPriority(1);
+            m.setPriority(1);
             m.addCapture(pieces[x + dx, y + dy]);
             p.addMove(m);
         }
@@ -323,7 +349,7 @@ public class Board : MonoBehaviour
             return -1;
         if (pieces[x, y] == null) //no piece
             return 0;
-        if (pieces[x, y].getSide() == "player") //player's piece
+        if (pieces[x, y].getPlayer() == turn) //player's piece
             return -1;
         return 1; //opponent's piece
     }
