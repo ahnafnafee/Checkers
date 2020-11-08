@@ -26,6 +26,7 @@ public class Board : MonoBehaviour
     private string player1Color = "White";
     private string player2Color = "Black";
 
+    bool multiCapture = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -42,10 +43,27 @@ public class Board : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (selected == null)
+            if (multiCapture)
+            {
+                Move selectedMove = CheckValid(x, y);
+                if (selectedMove != null)
+                {
+                    Piece p = pieces[selected.getX(), selected.getY()];
+                    Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
+                    MovePiece(selected, selectedMove);
+
+                    //Promote the piece
+                    if ((p.getPlayer() == 1 && y == 7) ||
+                        (p.getPlayer() == 2 && y == 0))
+                    {
+                        p.promote();
+                        //End turn after promotion
+                    }
+                }
+            }
+            else if (selected == null) //No pieces are selected
             {
                 FindMoves();
-                //No pieces are selected
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -65,22 +83,13 @@ public class Board : MonoBehaviour
                         if ((p.getPlayer() == 1 && y == 7) ||
                             (p.getPlayer() == 2 && y == 0)) 
                             p.promote();
-
-
-                        turn = (turn == 1) ? 2 : 1;
-                        Debug.Log("Turn " + turn);
                     }
-
-                    //After moving the piece
-                    ClearHighlights();
+                    
                 }
             }
-
-            DebugBoard();
+            //DebugBoard();
         }
-
     }
-
 
     //Check if the selected move is in the list of valid moves for the selected piece
     private Move CheckValid(int x, int y)
@@ -118,22 +127,35 @@ public class Board : MonoBehaviour
     //Create all pieces
     private void CreateBoard()
     {
+        //Multi capture front
+        /*CreatePiece(1, 1, 1);
+        CreatePiece(2, 2, 2);
+        CreatePiece(4, 4, 2);
+        CreatePiece(6, 6, 2);
+        CreatePiece(2, 4, 2);
+        CreatePiece(4, 6, 2);*/
+
+        //multi capture king
+        /*CreatePiece(6, 6, 1);
+        pieces[6, 6].promote();
+        CreatePiece(1, 1, 2);
+        CreatePiece(3, 3, 2);
+        CreatePiece(5, 5, 2);
+        CreatePiece(1, 3, 2);
+        CreatePiece(1, 5, 2);
+        CreatePiece(3, 5, 2);
+        CreatePiece(7, 5, 2);*/
+
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 8; x += 2)
                 CreatePiece(x + y % 2, y, 1);
         }
-
-        //CreatePiece(1 , 3, "opponent");
-        //CreatePiece(3 , 5, "opponent");
-
         for (int y = 5; y < 8; y++)
         {
             for (int x = 0; x < 8; x += 2)
                 CreatePiece(x + y % 2, y, 2);
         }
-
-        FindMoves();
     }
 
     //Create a piece at x,y
@@ -147,8 +169,6 @@ public class Board : MonoBehaviour
         p.move(x,y);
         p.setPlayer(player);
         pieces[x, y] = p;
-
-        //MoveGameObject(p, x, y);
     }
 
     //Select the piece return true if a piece is selected
@@ -182,37 +202,107 @@ public class Board : MonoBehaviour
         }
     }
 
-    ///
-    /// Send this message to server 
-    /// p contains selected piece
-    /// move contains the destination x,y and pieces to capture
-    ///
     //Move the selected piece to x,y 
     private void MovePiece(Piece p, Move move)
     {
         int x = move.getX();
         int y = move.getY();
         pieces[p.getX(), p.getY()] = null;
-        p.move(x,y);
+        p.move(x, y);
         pieces[x, y] = p;
-        selected = null;
 
-        bool multiCapture = false;
-        List<Square> captures = move.getCaptures();
-        Debug.Log("Cap num "+ x + " " + y +" "+captures.Count);
-        for (int i = 0; i < captures.Count; i++)
+        ClearHighlights();
+
+        //Delete captured piece
+        Piece capture = move.getCapture();
+        if (capture != null) { 
+            int cX = capture.getX();
+            int cY = capture.getY();
+            Destroy(capture.gameObject);
+            pieces[cX, cY] = null;
+
+            //clear all moves
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Piece tmpP = pieces[i, j];
+                    if (tmpP != null)
+                        tmpP.clearMoves();
+                }
+            }
+            //find additional capture
+            findMultiCapture(x, y, x - cX, y - cY);
+        }
+
+        if (multiCapture)
         {
-            Destroy(captures[i].gameObject);
+            selected.select(true);
+            DisplayMoves();
+        }
+        else 
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Piece tmpP = pieces[i, j];
+                    if (tmpP != null)
+                        tmpP.clearMoves();
+                }
+            }
+            selected.select(false);
+            selected = null;
+            turn = (turn == 1) ? 2 : 1;
+            Debug.Log("Turn " + turn);
+        }
+
+    }
+
+    private void findMultiCapture(int x, int y, int dx, int dy)
+    {
+        multiCapture = false;
+
+        int adjSquareL = CheckSquare(x - 1, y + dy);
+        int jumpSquareL = CheckSquare(x - 2, y + 2 * dy);
+        int adjSquareR = CheckSquare(x + 1, y + dy);
+        int jumpSquareR = CheckSquare(x + 2, y + 2 * dy);
+
+        if (adjSquareL == 1 && jumpSquareL == 0)
+        {
+            Move mL = CreateMovePrefab("Move");
+            mL.move(x - 2, y + 2 * dy);
+            mL.setPriority(1);
+            mL.setCapture(pieces[x - 1, y + dy]);
+            selected.addMove(mL);
             multiCapture = true;
         }
-        //MoveGameObject(p, x, y);
 
-        /*if (multiCapture)
+        if (adjSquareR == 1 && jumpSquareR == 0)
         {
-            SelectPiece(x, y);
-        }*/
-        //Select and find moves again if a capturing move is available let player move again if not end turn
+            Move mR = CreateMovePrefab("Move");
+            mR.move(x + 2, y + 2 * dy);
+            mR.setPriority(1);
+            mR.setCapture(pieces[x + 1, y + dy]);
+            selected.addMove(mR);
+            multiCapture = true;
+        }
 
+        if (selected.getKing())
+        {
+            int adjSquareB = CheckSquare(x + dx, y - dy);
+            int jumpSquareB = CheckSquare(x + 2 * dx, y - 2 * dy);
+
+            if (adjSquareB == 1 && jumpSquareB == 0)
+            {
+                Move mB = CreateMovePrefab("Move");
+                mB.move(x + 2 * dx, y - 2 * dy);
+                mB.setPriority(1);
+                mB.setCapture(pieces[x + dx, y - dy]);
+                selected.addMove(mB);
+                multiCapture = true;
+            }
+        }
     }
 
     //Display all possible moves of selected piece
@@ -221,14 +311,12 @@ public class Board : MonoBehaviour
         List<Move> moves = selected.getMoves();
         for (int i = 0; i < selected.getMovesNum(); i++)
         {
-            GameObject go = Instantiate(highlightPrefab, transform, true);
-            Move h = go.GetComponent<Move>();
-
+            Move h = CreateMovePrefab("Highlight");
             int x = moves[i].getX();
             int y = moves[i].getY();
-            List<Square> captures = moves[i].getCaptures();
+            Piece capture = moves[i].getCapture();
             h.move(x,y);
-            h.setCapture(captures);
+            h.setCapture(capture);
             highlights.Add(h);
         }
     }
@@ -300,7 +388,6 @@ public class Board : MonoBehaviour
         }
     }
 
-
     private Square CreateSquarePrefab(string c)
     {
         GameObject go = Instantiate(square, transform, true);
@@ -343,20 +430,20 @@ public class Board : MonoBehaviour
         int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
 
-        if (adjSquare == 0)
+        if (adjSquare == 0) //Move
         {
             m.move(x + dx, y + dy);
             m.setPriority(0);
             p.addMove(m);
         }
-        else if (adjSquare == 1 && jumpSquare == 0)
+        else if (adjSquare == 1 && jumpSquare == 0) //Capture
         {
             m.move(x + 2 * dx, y + 2 * dy);
             m.setPriority(1);
-            m.addCapture(pieces[x + dx, y + dy]);
+            m.setCapture(pieces[x + dx, y + dy]);
             p.addMove(m);
         }
-        else
+        else //No possible move
         {
             Destroy(m.gameObject);
         }

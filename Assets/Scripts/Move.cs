@@ -4,22 +4,17 @@ using UnityEngine;
 
 public class Move : Square
 {
-    private List<Square> captures = new List<Square>();
+    private Piece capture;
     private int priority = 0;
 
-    public List<Square> getCaptures()
+    public Piece getCapture()
     {
-        return captures;
+        return capture;
     }
-    public void addCapture(Square piece)
+    public void setCapture(Piece pieces)
     {
-        captures.Add(piece);
+        capture = pieces;
     }
-    public void setCapture(List<Square> pieces)
-    {
-        captures = pieces;
-    }
-    
     public int getPriority()
     {
         return priority;
