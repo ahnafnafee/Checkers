@@ -47,23 +47,10 @@ public class Board : MonoBehaviour
             {
                 Move selectedMove = CheckValid(x, y);
                 if (selectedMove != null)
-                {
-                    Piece p = pieces[selected.getX(), selected.getY()];
-                    Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
                     MovePiece(selected, selectedMove);
-
-                    //Promote the piece
-                    if ((p.getPlayer() == 1 && y == 7) ||
-                        (p.getPlayer() == 2 && y == 0))
-                    {
-                        p.promote();
-                        //End turn after promotion
-                    }
-                }
             }
             else if (selected == null) //No pieces are selected
             {
-                FindMoves();
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -71,20 +58,9 @@ public class Board : MonoBehaviour
                 selected.select(false);
                 if (!SelectPiece(x, y)) //If not selecting another piece
                 {
-
                     Move selectedMove = CheckValid(x, y);
                     if (selectedMove != null)
-                    {
-                        Piece p = pieces[selected.getX(), selected.getY()];
-                        Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
-                        MovePiece(p, selectedMove);
-
-                        //Promote the piece
-                        if ((p.getPlayer() == 1 && y == 7) ||
-                            (p.getPlayer() == 2 && y == 0)) 
-                            p.promote();
-                    }
-                    
+                        MovePiece(selected, selectedMove);
                 }
             }
             //DebugBoard();
@@ -146,6 +122,15 @@ public class Board : MonoBehaviour
         CreatePiece(3, 5, 2);
         CreatePiece(7, 5, 2);*/
 
+        //promote mid multi capture
+        /*CreatePiece(1, 1, 1);
+        CreatePiece(3, 1, 1);
+        CreatePiece(2, 2, 2);
+        CreatePiece(4, 4, 2);
+        CreatePiece(6, 6, 2);
+        CreatePiece(2, 4, 2);
+        CreatePiece(4, 6, 2);*/
+
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 8; x += 2)
@@ -156,6 +141,7 @@ public class Board : MonoBehaviour
             for (int x = 0; x < 8; x += 2)
                 CreatePiece(x + y % 2, y, 2);
         }
+        FindMoves();
     }
 
     //Create a piece at x,y
@@ -202,11 +188,47 @@ public class Board : MonoBehaviour
         }
     }
 
+    private void winner()
+    {
+        int p1Count = 0;
+        int p1MovesCount = 0;
+        int p2Count = 0;
+        int p2MovesCount = 0;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Piece p = pieces[i, j];
+                if (p != null)
+                {
+                    if (p.getPlayer() == 1)
+                    {
+                        p1Count += 1;
+                        p1MovesCount += p.getMovesNum();
+                    }
+                    else
+                    {
+                        p2Count += 1;
+                        p2MovesCount += p.getMovesNum();
+                    }
+                }
+                    
+            }
+        }
+        //if no pieces left or no available moves
+        if (p2Count == 0 || p2MovesCount == 0 && turn == 2)
+            Debug.Log("P1 won");
+        else if (p1Count == 0 || p1MovesCount == 0 && turn == 1)
+            Debug.Log("P2 won");
+    }
+
     //Move the selected piece to x,y 
     private void MovePiece(Piece p, Move move)
     {
         int x = move.getX();
         int y = move.getY();
+        Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
         pieces[p.getX(), p.getY()] = null;
         p.move(x, y);
         pieces[x, y] = p;
@@ -254,9 +276,19 @@ public class Board : MonoBehaviour
             selected.select(false);
             selected = null;
             turn = (turn == 1) ? 2 : 1;
+            //Display turn change
             Debug.Log("Turn " + turn);
+
+            FindMoves();
+
+            //Check winner
+            winner();
         }
 
+        //Promote the piece
+        if ((p.getPlayer() == 1 && y == 7) ||
+            (p.getPlayer() == 2 && y == 0))
+            p.promote();
     }
 
     private void findMultiCapture(int x, int y, int dx, int dy)
@@ -325,9 +357,7 @@ public class Board : MonoBehaviour
     private void ClearHighlights()
     {
         for (int i = 0; i < highlights.Count; i++)
-        {
             Destroy(highlights[i].gameObject);
-        }
         highlights.Clear();
     }
 
@@ -341,48 +371,47 @@ public class Board : MonoBehaviour
             for (int j = 0; j < 8; j++)
             {
                 Piece p = pieces[i, j];
-                if (p != null)
+                if (p == null)
+                    continue;
+                p.clearMoves();
+
+                int player = p.getPlayer();
+                if (player != turn)
+                    continue;
+
+                int up = 1;
+                int dn = -1;
+                if (player == 2)
                 {
+                    up = -1;
+                    dn = 1;
+                }
+
+                //move forwards
+                CheckDirection(p, i, j, dn, up);
+                CheckDirection(p, i, j, up, up);
+
+                if (p.getKing()) //move backwards if the piece is a king
+                {
+                    CheckDirection(p, i, j, dn, dn);
+                    CheckDirection(p, i, j, up, dn);
+                }
+
+                //If a capture move is available, keep only capture moves
+                int prio = p.getPriority();
+                if (prio > priority)
+                {
+                    foreach (Piece piece in movablePieces)
+                        piece.clearMoves();
+
+                    movablePieces.Clear();
+                    priority = prio;
+                }
+                if (prio >= priority)
+                    movablePieces.Add(p);
+                else
                     p.clearMoves();
 
-                    int player = p.getPlayer();
-                    if (player != turn)
-                        continue;
-                    int up = 1;
-                    int dn = -1;
-                    if (player == 2)
-                    {
-                        up = -1;
-                        dn = 1;
-                    }
-
-                    //move forwards
-                    CheckDirection(p, i, j, dn, up);
-                    CheckDirection(p, i, j, up, up);
-
-                    if (p.getKing())
-                    {
-                        //move backwards if the piece is a king
-                        CheckDirection(p, i, j, dn, dn);
-                        CheckDirection(p, i, j, up, dn);
-                    }
-                    
-
-                    //If a capture move is available, keep only capture moves
-                    int prio = p.getPriority();
-                    if (prio > priority)
-                    {
-                        foreach (Piece piece in movablePieces)
-                            piece.clearMoves();
-
-                        movablePieces.Clear();
-                        priority = prio;
-                    }
-                    if (prio >= priority)
-                        movablePieces.Add(p);
-                    else
-                        p.clearMoves();
-                }
             }
 
         }
