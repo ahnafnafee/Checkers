@@ -530,8 +530,9 @@ public class Board1 : MonoBehaviourPunCallbacks
 
     private Piece1 CreateSquarePrefab(string c)
     {
-        GameObject go = Instantiate(square, transform, true);
-        go.AddComponent<PhotonView>();
+        GameObject go = PhotonNetwork.Instantiate("Square1", transform.position, Quaternion.identity);
+        // GameObject go = Instantiate(square, transform, true);
+        // go.AddComponent<PhotonView>();
         go.transform.parent = transform.Find("TempObjects").transform;
         return go.GetComponent<Piece1>();
     }
@@ -541,13 +542,15 @@ public class Board1 : MonoBehaviourPunCallbacks
         switch (c)
         {
             case "Highlight":
-                go = Instantiate(highlightPrefab, transform, true);
-                go.AddComponent<PhotonView>();
+                go = PhotonNetwork.Instantiate("Highlight1", transform.position, Quaternion.identity);
+                // go = Instantiate(highlightPrefab, transform, true);
+                // go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
             default:
-                go = Instantiate(move, transform, true);
-                go.AddComponent<PhotonView>();
+                go = PhotonNetwork.Instantiate("Move1", transform.position, Quaternion.identity);
+                // go = Instantiate(move, transform, true);
+                // go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
         }
@@ -558,12 +561,14 @@ public class Board1 : MonoBehaviourPunCallbacks
         switch (c)
         {
             case "White":
-                go = Instantiate(whitePiecePrefab, transform, true);
-                go.AddComponent<PhotonView>();
+                go = PhotonNetwork.Instantiate("LightToken1", transform.position, Quaternion.identity);
+                // go = Instantiate(whitePiecePrefab, transform, true);
+                // go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
             default:
-                go = Instantiate(blackPiecePrefab, transform, true);
-                go.AddComponent<PhotonView>();
+                go = PhotonNetwork.Instantiate("DarkToken1", transform.position, Quaternion.identity);
+                // go = Instantiate(blackPiecePrefab, transform, true);
+                // go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
         }
     }
