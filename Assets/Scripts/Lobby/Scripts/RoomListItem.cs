@@ -10,10 +10,10 @@ namespace Lobby.Scripts
 
         public RoomInfo info;
 
-        public void SetUp(RoomInfo _info)
+        public void SetUp(RoomInfo Info)
         {
-            this.info = _info;
-            text.text = _info.Name;
+            this.info = Info;
+            text.text = Info.Name;
         }
 
         public void OnClick()

@@ -59,6 +59,7 @@ namespace Lobby.Scripts
         {
             MenuManager.Instance.OpenMenu("room");
             roomNameText.text = PhotonNetwork.CurrentRoom.Name;
+            PhotonNetwork.CurrentRoom.MaxPlayers = 2;
             
             Player[] players = PhotonNetwork.PlayerList;
 
@@ -73,6 +74,7 @@ namespace Lobby.Scripts
             }
 
             startGameButton.SetActive(PhotonNetwork.IsMasterClient);
+            
         }
         
         public override void OnMasterClientSwitched(Player newMasterClient)
@@ -89,6 +91,11 @@ namespace Lobby.Scripts
         
         public void StartGame()
         {
+            // if (PhotonNetwork.IsMasterClient)
+            // {
+            //     PhotonNetwork.LoadLevel(1);
+            // }
+            
             PhotonNetwork.LoadLevel(1);
         }
         

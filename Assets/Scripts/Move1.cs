@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Move : Square
+public class Move1 : Piece1
 {
-    private Piece capture;
+    private Piece1 capture;
     private int priority = 0;
 
-    public Piece GetCapture()
+    public Piece1 GetCapture()
     {
         return capture;
     }
-    public void SetCapture(Piece pieces)
+    public void SetCapture(Piece1 pieces)
     {
         capture = pieces;
     }

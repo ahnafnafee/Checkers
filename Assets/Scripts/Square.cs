@@ -1,38 +1,47 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class Square : MonoBehaviour
+public class Square : MonoBehaviourPun
 {
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
-    protected int x = 0;
-    protected int y = 0;
-    
-    // PhotonView PV;
+    protected int X = 0;
+    protected int Y = 0;
 
-    void Awake()
+    public int GetX()
     {
-        // PV = GetComponent<PhotonView>();
+        return X;
     }
-    public int getX()
+    public void Move(int x, int y)
     {
-        return x;
-    }
-    
-    public void move(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
+        X = x;
+        Y = y;
         transform.position = new Vector2(x, y) + boardOffset + pieceOffset;
     }
-    public int getY()
+    
+    public void SetVal(int xVal, int yVal)
     {
-        return y;
+        X = xVal;
+        Y = yVal;
+    }
+    public int GetY()
+    {
+        return Y;
     }
 
-
+    private void Awake()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+    
+    private void OnDestroy()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
 }

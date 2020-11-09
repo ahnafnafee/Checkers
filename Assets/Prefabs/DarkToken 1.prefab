@@ -92,11 +92,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8659051625264144253}
   - component: {fileID: 8659051625264144252}
-  - component: {fileID: -5900953239924404372}
-  - component: {fileID: 8667661785079537201}
-  - component: {fileID: 5078720612859237568}
+  - component: {fileID: -5046110868358268687}
   m_Layer: 0
-  m_Name: DarkToken
+  m_Name: DarkToken 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,7 +167,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-5900953239924404372
+--- !u!114 &-5046110868358268687
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -178,47 +176,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8659051625264144255}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ef0133f1139be04abd221b718115820, type: 3}
+  m_Script: {fileID: 11500000, guid: 041859073c81c1e4dbb65eec6255bb0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8667661785079537201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8659051625264144255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 0
-  Synchronization: 3
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 5078720612859237568}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &5078720612859237568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8659051625264144255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
 --- !u!1 &8659051625494438583
 GameObject:
   m_ObjectHideFlags: 0
