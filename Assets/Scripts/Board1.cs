@@ -29,6 +29,7 @@ public class Board1 : MonoBehaviourPunCallbacks
     private int turn = 1; //1 = player 1; 2 = player 2
 
     //Change player color
+    // TODO: Look into PunTurnManager
     private string player1Color = "White";
     private string player2Color = "Black";
 
@@ -43,7 +44,7 @@ public class Board1 : MonoBehaviourPunCallbacks
     
     void Start()
     {
-        CreateBoard();
+        // CreateBoard();
         //Set player1 and player2 color
     }
 
@@ -216,9 +217,27 @@ public class Board1 : MonoBehaviourPunCallbacks
     }
 
     //Create all pieces
-    // [PunRPC]
+    [PunRPC]
     public void CreateBoard()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Debug.Log("ONLY MASTER");
+            
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 8; x += 2)
+                    CreatePiece(x + y % 2, y, 1);
+            }
+            for (int y = 5; y < 8; y++)
+            {
+                for (int x = 0; x < 8; x += 2)
+                    CreatePiece(x + y % 2, y, 2);
+            }
+            FindMoves();
+            
+        }
+        
         //Multi capture front
         /*CreatePiece(1, 1, 1);
         CreatePiece(2, 2, 2);
@@ -247,17 +266,7 @@ public class Board1 : MonoBehaviourPunCallbacks
         CreatePiece(2, 4, 2);
         CreatePiece(4, 6, 2);*/
 
-        for (int y = 0; y < 3; y++)
-        {
-            for (int x = 0; x < 8; x += 2)
-                CreatePiece(x + y % 2, y, 1);
-        }
-        for (int y = 5; y < 8; y++)
-        {
-            for (int x = 0; x < 8; x += 2)
-                CreatePiece(x + y % 2, y, 2);
-        }
-        FindMoves();
+        
     }
 
     //Create a piece at x,y
