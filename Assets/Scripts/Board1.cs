@@ -114,8 +114,10 @@ public class Board1 : MonoBehaviourPunCallbacks
         // pv.RPC("MoveGameObject", RpcTarget.All);
         // MoveGameObject();
         
+        PhotonView pView = p.GetComponent<PhotonView>();
+        pView.RPC("Move", RpcTarget.All,  x, y);
         
-        p.Move(x, y);
+        // p.Move(x, y);
         
         
         pieces[x, y] = p;
@@ -273,7 +275,10 @@ public class Board1 : MonoBehaviourPunCallbacks
         // pv.RPC("MoveGameObject", RpcTarget.All);
         // MoveGameObject();
         
-        p.Move(x,y);
+        PhotonView pView = p.GetComponent<PhotonView>();
+        pView.RPC("Move", RpcTarget.All,  x, y);
+        
+        // p.Move(x,y);
         
         
         p.SetPlayer(player);
@@ -367,8 +372,11 @@ public class Board1 : MonoBehaviourPunCallbacks
             // pv.RPC("MoveGameObject", RpcTarget.All);
             // MoveGameObject();
             
+            PhotonView pView = mL.GetComponent<PhotonView>();
+            pView.RPC("Move", RpcTarget.All,  x - 2, y + 2 * dy);
             
-            mL.Move(x - 2, y + 2 * dy);
+            
+            // mL.Move(x - 2, y + 2 * dy);
             
             
             mL.SetPriority(1);
@@ -387,8 +395,10 @@ public class Board1 : MonoBehaviourPunCallbacks
             // pv.RPC("MoveGameObject", RpcTarget.All);
             // MoveGameObject();
             
+            PhotonView pView = mR.GetComponent<PhotonView>();
+            pView.RPC("Move", RpcTarget.All,  x + 2, y + 2 * dy);
             
-            mR.Move(x + 2, y + 2 * dy);
+            // mR.Move(x + 2, y + 2 * dy);
             
             
             mR.SetPriority(1);
@@ -412,8 +422,10 @@ public class Board1 : MonoBehaviourPunCallbacks
                 // pv.RPC("MoveGameObject", RpcTarget.All);
                 // MoveGameObject();
                 
+                PhotonView pView = mB.GetComponent<PhotonView>();
+                pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y - 2 * dy);
                 
-                mB.Move(x + 2 * dx, y - 2 * dy);
+                // mB.Move(x + 2 * dx, y - 2 * dy);
                 
                 
                 mB.SetPriority(1);
@@ -441,8 +453,10 @@ public class Board1 : MonoBehaviourPunCallbacks
             // pv.RPC("MoveGameObject", RpcTarget.All);
             // MoveGameObject();
             
-            
-            h.Move(x,y);
+            PhotonView pView = h.GetComponent<PhotonView>();
+            pView.RPC("Move", RpcTarget.All,  x, y);
+
+            // h.Move(x,y);
             
             
             h.SetCapture(capture);
@@ -517,6 +531,7 @@ public class Board1 : MonoBehaviourPunCallbacks
     private Piece1 CreateSquarePrefab(string c)
     {
         GameObject go = Instantiate(square, transform, true);
+        go.AddComponent<PhotonView>();
         go.transform.parent = transform.Find("TempObjects").transform;
         return go.GetComponent<Piece1>();
     }
@@ -527,10 +542,12 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             case "Highlight":
                 go = Instantiate(highlightPrefab, transform, true);
+                go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
             default:
                 go = Instantiate(move, transform, true);
+                go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
         }
@@ -542,9 +559,11 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             case "White":
                 go = Instantiate(whitePiecePrefab, transform, true);
+                go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
             default:
                 go = Instantiate(blackPiecePrefab, transform, true);
+                go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
         }
     }
@@ -564,9 +583,11 @@ public class Board1 : MonoBehaviourPunCallbacks
             // tPiece = m;
             // pv.RPC("MoveGameObject", RpcTarget.All);
             // MoveGameObject();
+
+            PhotonView pView = m.GetComponent<PhotonView>();
+            pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
             
-            
-            m.Move(x + dx, y + dy);
+            // m.Move(x + dx, y + dy);
             
             
             m.SetPriority(0);
@@ -581,8 +602,10 @@ public class Board1 : MonoBehaviourPunCallbacks
             // pv.RPC("MoveGameObject", RpcTarget.All);
             // MoveGameObject();
             
+            PhotonView pView = m.GetComponent<PhotonView>();
+            pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
             
-            m.Move(x + 2 * dx, y + 2 * dy);
+            // m.Move(x + 2 * dx, y + 2 * dy);
             
             
             m.SetPriority(1);

@@ -114,7 +114,7 @@ public class Piece1 : MonoBehaviour
         return X;
     }
 
-    // [PunRPC]
+    [PunRPC]
     public void Move(int x, int y)
     {
         X = x;
