@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using Mirror;
+using Photon.Pun;
 using UnityEngine;
 
 public class Board : MonoBehaviour
 {
+    public static Board Instance;
+    private PhotonView pv;
+    private Square go;
+    
     public GameObject highlightPrefab;
     public GameObject whitePiecePrefab;
     public GameObject blackPiecePrefab;
@@ -26,6 +31,13 @@ public class Board : MonoBehaviour
     private string player1Color = "White";
     private string player2Color = "Black";
 
+    
+    void Awake()
+    {
+        Instance = this;
+        pv = GetComponent<PhotonView>();
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -140,11 +152,15 @@ public class Board : MonoBehaviour
     private void CreatePiece(int x, int y, int player)
     {
         Piece p;
+        
         if (player == 1)
             p = CreatePiecePrefab(player1Color);
         else
             p = CreatePiecePrefab(player2Color);
-        p.move(x,y);
+
+        go = p;
+        pv.RPC("MoveGameObject", RpcTarget.All,  x, y);
+        // p.move(x,y);
         p.setPlayer(player);
         pieces[x, y] = p;
 
@@ -193,7 +209,11 @@ public class Board : MonoBehaviour
         int x = move.getX();
         int y = move.getY();
         pieces[p.getX(), p.getY()] = null;
-        p.move(x,y);
+
+        go = p;
+        pv.RPC("MoveGameObject", RpcTarget.All,  x, y);
+        
+        // p.move(x,y);
         pieces[x, y] = p;
         selected = null;
 
@@ -221,13 +241,17 @@ public class Board : MonoBehaviour
         List<Move> moves = selected.getMoves();
         for (int i = 0; i < selected.getMovesNum(); i++)
         {
-            GameObject go = Instantiate(highlightPrefab, transform, true);
-            Move h = go.GetComponent<Move>();
+            GameObject xGo = Instantiate(highlightPrefab, transform, true);
+            Move h = xGo.GetComponent<Move>();
 
             int x = moves[i].getX();
             int y = moves[i].getY();
             List<Square> captures = moves[i].getCaptures();
-            h.move(x,y);
+
+            go =  h;
+            pv.RPC("MoveGameObject", RpcTarget.All, x, y);
+            
+            // h.move(x,y);
             h.setCapture(captures);
             highlights.Add(h);
         }
@@ -335,6 +359,13 @@ public class Board : MonoBehaviour
                 return go.GetComponent<Piece>();
         }
     }
+    
+    [PunRPC]
+    private void MoveGameObject(int x, int y)
+    {
+        
+        go.transform.position = (Vector2.right * x) + (Vector2.up * y) + boardOffset + pieceOffset;
+    }
 
     private void CheckDirection(Piece p, int x, int y, int dx, int dy)
     {
@@ -342,16 +373,22 @@ public class Board : MonoBehaviour
         int adjSquare = CheckSquare(x + dx, y + dy);
         int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
-
         if (adjSquare == 0)
         {
-            m.move(x + dx, y + dy);
+
+            go = p;
+            pv.RPC("MoveGameObject", RpcTarget.All,  x + dx, y + dy);
+            
+            // m.move(x + dx, y + dy);
             m.setPriority(0);
             p.addMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0)
         {
-            m.move(x + 2 * dx, y + 2 * dy);
+            go = p;
+            pv.RPC("MoveGameObject", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
+            
+            // m.move(x + 2 * dx, y + 2 * dy);
             m.setPriority(1);
             m.addCapture(pieces[x + dx, y + dy]);
             p.addMove(m);

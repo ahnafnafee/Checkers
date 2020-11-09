@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Photon.Pun;
 using UnityEngine;
 
 public class Square : MonoBehaviour
@@ -10,11 +11,18 @@ public class Square : MonoBehaviour
 
     protected int x = 0;
     protected int y = 0;
+    
+    // PhotonView PV;
 
+    void Awake()
+    {
+        // PV = GetComponent<PhotonView>();
+    }
     public int getX()
     {
         return x;
     }
+    
     public void move(int x, int y)
     {
         this.x = x;
