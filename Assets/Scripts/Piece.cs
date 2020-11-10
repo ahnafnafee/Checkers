@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class Piece : Square
+public class Piece : Square, IPunOwnershipCallbacks
 {
     private int player;
     private bool king = false;
@@ -37,7 +39,7 @@ public class Piece : Square
     }
     public void addMove(Move move)
     {
-        int prio = move.getPriority();
+        int prio = move.GetPriority();
         if (prio > priority) //Force capture
         {
             foreach (Move m in moves)
@@ -66,6 +68,31 @@ public class Piece : Square
     public int getPriority()
     {
         return priority;
+    }
+    
+    public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+    {
+        if (targetView != base.photonView)
+        {
+            return;
+        }
+        
+        base.photonView.TransferOwnership(requestingPlayer);
+    }
+
+    public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+    {
+        if (targetView != base.photonView)
+        {
+            return;
+        }
+        
+        // base.photonView.TransferOwnership(previousOwner);
+    }
+
+    private void OnMouseDown()
+    {
+        base.photonView.RequestOwnership();
     }
 
 
