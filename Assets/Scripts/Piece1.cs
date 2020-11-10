@@ -132,6 +132,12 @@ public class Piece1 : MonoBehaviour
     {
         return Y;
     }
+    
+    [PunRPC]
+    public void DestroyPiece()
+    {
+        Destroy(gameObject);
+    }
 
     // private void Awake()
     // {

@@ -5,6 +5,12 @@ using UnityEngine;
 
 public class Board1 : MonoBehaviourPunCallbacks
 {
+    // TODO: Piece should be selectable by BOTH players
+    // TODO: Move and highlight objects should be client side
+    // TODO: Fix highlight spawn on other client
+    // TODO: Piece array needs to be synced
+    // TODO: Implement server side turn manager (Look into PunTurnManager)
+
     public static Board1 Instance;
     private PhotonView pv;
     private Piece1 tPiece;
@@ -44,7 +50,7 @@ public class Board1 : MonoBehaviourPunCallbacks
     
     void Start()
     {
-        // CreateBoard();
+        CreateBoard();
         //Set player1 and player2 color
     }
 
@@ -52,7 +58,6 @@ public class Board1 : MonoBehaviourPunCallbacks
     void Update()
     {
         UpdateMouseOver();
-        // pv.RPC("UpdateMouseOver", RpcTarget.All);
 
         int x = (int)mouseOver.x;
         int y = (int)mouseOver.y;
@@ -65,15 +70,11 @@ public class Board1 : MonoBehaviourPunCallbacks
                 if (selectedMove != null)
                 {
                     sMove = selectedMove;
-                    // pv.RPC("MovePiece", RpcTarget.All);
                     MovePiece();
-                    
-                    // MovePiece(selected, selectedMove);
                 }
             }
             else if (selected == null) //No pieces are selected
             {
-                // pv.RPC("SelectPiece", RpcTarget.AllBufferedViaServer, x, y);
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -85,20 +86,15 @@ public class Board1 : MonoBehaviourPunCallbacks
                     if (selectedMove != null)
                     {
                         sMove = selectedMove;
-                        // pv.RPC("MovePiece", RpcTarget.All);
                         MovePiece();
-                        
-                        // MovePiece(selected, selectedMove);
                     }
                 }
             }
+            
             //DebugBoard();
         }
     }
     
-    
-    //Move the selected piece to x,y 
-    // [PunRPC]
     private void MovePiece()
     {
         Piece1 p = selected;
@@ -109,12 +105,7 @@ public class Board1 : MonoBehaviourPunCallbacks
         Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
         pieces[p.GetX(), p.GetY()] = null;
         
-        // RPC Move Possible
-        // p.SetVal(x, y);
-        // tPiece = p;
-        // pv.RPC("MoveGameObject", RpcTarget.All);
-        // MoveGameObject();
-        
+        // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
         pView.RPC("Move", RpcTarget.All,  x, y);
         
@@ -194,7 +185,6 @@ public class Board1 : MonoBehaviourPunCallbacks
     }
 
     //Get mouse location
-    // [PunRPC]
     private void UpdateMouseOver()
     {
         if (!Camera.main)
@@ -217,7 +207,7 @@ public class Board1 : MonoBehaviourPunCallbacks
     }
 
     //Create all pieces
-    [PunRPC]
+    // [PunRPC]
     public void CreateBoard()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -278,12 +268,7 @@ public class Board1 : MonoBehaviourPunCallbacks
         else
             p = CreatePiecePrefab(player2Color);
         
-        // RPC Move Possible
-        // p.SetVal(x, y);
-        // tPiece = p;
-        // pv.RPC("MoveGameObject", RpcTarget.All);
-        // MoveGameObject();
-        
+        // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
         pView.RPC("Move", RpcTarget.All,  x, y);
         
@@ -375,17 +360,11 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             Move1 mL = CreateMovePrefab("Move");
             
-            // RPC Move Possible
-            // mL.SetVal(x - 2, y + 2 * dy);
-            // tPiece = mL;
-            // pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
+            // NetSynced Move / Client ?
+            // PhotonView pView = mL.GetComponent<PhotonView>();
+            // pView.RPC("Move", RpcTarget.All,  x - 2, y + 2 * dy);
             
-            PhotonView pView = mL.GetComponent<PhotonView>();
-            pView.RPC("Move", RpcTarget.All,  x - 2, y + 2 * dy);
-            
-            
-            // mL.Move(x - 2, y + 2 * dy);
+            mL.Move(x - 2, y + 2 * dy);
             
             
             mL.SetPriority(1);
@@ -398,17 +377,11 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             Move1 mR = CreateMovePrefab("Move");
             
-            // RPC Move Possible
-            // mR.SetVal(x + 2, y + 2 * dy);
-            // tPiece = mR;
-            // pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
+            // NetSynced Move / Client ?
+            // PhotonView pView = mR.GetComponent<PhotonView>();
+            // pView.RPC("Move", RpcTarget.All,  x + 2, y + 2 * dy);
             
-            PhotonView pView = mR.GetComponent<PhotonView>();
-            pView.RPC("Move", RpcTarget.All,  x + 2, y + 2 * dy);
-            
-            // mR.Move(x + 2, y + 2 * dy);
-            
+            mR.Move(x + 2, y + 2 * dy);
             
             mR.SetPriority(1);
             mR.SetCapture(pieces[x + 1, y + dy]);
@@ -425,17 +398,11 @@ public class Board1 : MonoBehaviourPunCallbacks
             {
                 Move1 mB = CreateMovePrefab("Move");
                 
-                // RPC Move Possible
-                // mB.SetVal(x + 2 * dx, y - 2 * dy);
-                // tPiece = mB;
-                // pv.RPC("MoveGameObject", RpcTarget.All);
-                // MoveGameObject();
+                // NetSynced Move / Client ?
+                // PhotonView pView = mB.GetComponent<PhotonView>();
+                // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y - 2 * dy);
                 
-                PhotonView pView = mB.GetComponent<PhotonView>();
-                pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y - 2 * dy);
-                
-                // mB.Move(x + 2 * dx, y - 2 * dy);
-                
+                mB.Move(x + 2 * dx, y - 2 * dy);
                 
                 mB.SetPriority(1);
                 mB.SetCapture(pieces[x + dx, y - dy]);
@@ -456,17 +423,11 @@ public class Board1 : MonoBehaviourPunCallbacks
             int y = moves[i].GetY();
             Piece1 capture = moves[i].GetCapture();
             
-            // RPC Move Possible
-            // h.SetVal(x, y);
-            // tPiece = h;
-            // pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            PhotonView pView = h.GetComponent<PhotonView>();
-            pView.RPC("Move", RpcTarget.All,  x, y);
+            // NetSynced Move / Client ?
+            // PhotonView pView = h.GetComponent<PhotonView>();
+            // pView.RPC("Move", RpcTarget.All,  x, y);
 
-            // h.Move(x,y);
-            
+            h.Move(x,y);
             
             h.SetCapture(capture);
             highlights.Add(h);
@@ -477,7 +438,13 @@ public class Board1 : MonoBehaviourPunCallbacks
     private void ClearHighlights()
     {
         for (int i = 0; i < highlights.Count; i++)
-            Destroy(highlights[i].gameObject);
+        {
+            // NetSynced Destroy
+            PhotonView pView = highlights[i].GetComponent<PhotonView>();
+            pView.RPC("DestroyPiece", RpcTarget.All);
+            // Destroy(highlights[i].gameObject);
+        }
+
         highlights.Clear();
     }
 
@@ -540,8 +507,6 @@ public class Board1 : MonoBehaviourPunCallbacks
     private Piece1 CreateSquarePrefab(string c)
     {
         GameObject go = PhotonNetwork.Instantiate("Square1", transform.position, Quaternion.identity);
-        // GameObject go = Instantiate(square, transform, true);
-        // go.AddComponent<PhotonView>();
         go.transform.parent = transform.Find("TempObjects").transform;
         return go.GetComponent<Piece1>();
     }
@@ -552,14 +517,10 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             case "Highlight":
                 go = PhotonNetwork.Instantiate("Highlight1", transform.position, Quaternion.identity);
-                // go = Instantiate(highlightPrefab, transform, true);
-                // go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
             default:
                 go = PhotonNetwork.Instantiate("Move1", transform.position, Quaternion.identity);
-                // go = Instantiate(move, transform, true);
-                // go.AddComponent<PhotonView>();
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move1>();
         }
@@ -571,13 +532,9 @@ public class Board1 : MonoBehaviourPunCallbacks
         {
             case "White":
                 go = PhotonNetwork.Instantiate("LightToken1", transform.position, Quaternion.identity);
-                // go = Instantiate(whitePiecePrefab, transform, true);
-                // go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
             default:
                 go = PhotonNetwork.Instantiate("DarkToken1", transform.position, Quaternion.identity);
-                // go = Instantiate(blackPiecePrefab, transform, true);
-                // go.AddComponent<PhotonView>();
                 return go.GetComponent<Piece1>();
         }
     }
@@ -592,16 +549,11 @@ public class Board1 : MonoBehaviourPunCallbacks
         if (adjSquare == 0) //Move
         {
             
-            // RPC Move Possible
-            // m.SetVal(x + dx, y + dy);
-            // tPiece = m;
-            // pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-
-            PhotonView pView = m.GetComponent<PhotonView>();
-            pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
+            // NetSynced Move / Client ?
+            // PhotonView pView = m.GetComponent<PhotonView>();
+            // pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
             
-            // m.Move(x + dx, y + dy);
+            m.Move(x + dx, y + dy);
             
             
             m.SetPriority(0);
@@ -610,16 +562,11 @@ public class Board1 : MonoBehaviourPunCallbacks
         else if (adjSquare == 1 && jumpSquare == 0) //Capture
         {
             
-            // RPC Move Possible
-            // m.SetVal(x + 2 * dx, y + 2 * dy);
-            // tPiece = m;
-            // pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
+            // NetSynced Move / Client ?
+            // PhotonView pView = m.GetComponent<PhotonView>();
+            // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
             
-            PhotonView pView = m.GetComponent<PhotonView>();
-            pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
-            
-            // m.Move(x + 2 * dx, y + 2 * dy);
+            m.Move(x + 2 * dx, y + 2 * dy);
             
             
             m.SetPriority(1);
@@ -628,7 +575,10 @@ public class Board1 : MonoBehaviourPunCallbacks
         }
         else //No possible move
         {
-            Destroy(m.gameObject);
+            // NetSynced Destroy
+            PhotonView pView = m.GetComponent<PhotonView>();
+            pView.RPC("DestroyPiece", RpcTarget.All);
+            // Destroy(m.gameObject);
         }
     }
 
