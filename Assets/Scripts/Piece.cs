@@ -4,40 +4,50 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-public class Piece : Square, IPunOwnershipCallbacks
+public class Piece : MonoBehaviour
 {
-    private int player;
+    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
     private bool king = false;
     private List<Move> moves = new List<Move>();
+    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
+    private int player;
     private int priority = 0;
 
-    public int getPlayer()
+    protected int X = 0;
+    protected int Y = 0;
+
+    public int GetPlayer()
     {
         return player;
     }
-    public void setPlayer(int player)
+
+    public void SetPlayer(int player)
     {
         this.player = player;
     }
-    public bool getKing()
+
+    public bool GetKing()
     {
         return king;
     }
-    public void promote()
+
+    public void Promote()
     {
         king = true;
         gameObject.transform.Find("crown").gameObject.SetActive(true);
     }
-    public void select(bool select)
+
+    public void Select(bool select)
     {
         gameObject.transform.Find("selected").gameObject.SetActive(select);
     }
 
-    public List<Move> getMoves()
+    public List<Move> GetMoves()
     {
         return moves;
     }
-    public void addMove(Move move)
+
+    public void AddMove(Move move)
     {
         int prio = move.GetPriority();
         if (prio > priority) //Force capture
@@ -47,12 +57,14 @@ public class Piece : Square, IPunOwnershipCallbacks
             moves.Clear();
             priority = prio;
         }
+
         if (prio >= priority)
             moves.Add(move);
         else
             Destroy(move.gameObject);
     }
-    public void clearMoves()
+
+    public void ClearMoves()
     {
         foreach (Move move in moves)
             Destroy(move.gameObject);
@@ -60,40 +72,50 @@ public class Piece : Square, IPunOwnershipCallbacks
         moves.Clear();
         priority = 0;
     }
-    public int getMovesNum()
+
+    public int GetMovesNum()
     {
         return moves.Count;
     }
 
-    public int getPriority()
+    public int GetPriority()
     {
         return priority;
     }
+
+    // private void OnMouseDown()
+    // {
+    //     base.photonView.RequestOwnership();
+    // }
+
+
+    public int GetX()
+    {
+        return X;
+    }
+
+    [PunRPC]
+    public void Move(int x, int y)
+    {
+        X = x;
+        Y = y;
+        transform.position = new Vector2(x, y) + boardOffset + pieceOffset;
+    }
+
+    public void SetVal(int xVal, int yVal)
+    {
+        X = xVal;
+        Y = yVal;
+    }
+
+    public int GetY()
+    {
+        return Y;
+    }
     
-    public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+    [PunRPC]
+    public void DestroyPiece()
     {
-        if (targetView != base.photonView)
-        {
-            return;
-        }
-        
-        base.photonView.TransferOwnership(requestingPlayer);
+        Destroy(gameObject);
     }
-
-    public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
-    {
-        if (targetView != base.photonView)
-        {
-            return;
-        }
-        
-        // base.photonView.TransferOwnership(previousOwner);
-    }
-
-    private void OnMouseDown()
-    {
-        base.photonView.RequestOwnership();
-    }
-
-
 }

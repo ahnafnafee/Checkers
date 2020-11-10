@@ -4,9 +4,11 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - highlightPrefab: {fileID: 2799701355552364789, guid: 974686b571f83e54f81923c8e8dd173f, type: 3}
-  - whiteTokenPrefab: {fileID: 4970993380596824222, guid: 255f6112750915d44a3f406a5934a3b4, type: 3}
-  - blackTokenPrefab: {fileID: 8659051625264144255, guid: 884499c377b99854788f6e6566f6e704, type: 3}
+  - highlightPrefab: {fileID: 2799701355552364789, guid: 54a263eed2f9444478f4bb3b9a7b7794, type: 3}
+  - whitePiecePrefab: {fileID: 4970993380596824222, guid: 2a7c15eb38d13754f961f7bf025e37f7, type: 3}
+  - blackPiecePrefab: {fileID: 8659051625264144255, guid: 301253d5055b5734e8126748b9b11cc5, type: 3}
+  - square: {fileID: 2799701355552364789, guid: 8d4aa0a119cd4e74cb04e7c39607e74c, type: 3}
+  - move: {fileID: 2799701355552364789, guid: 7ffa5fd27f5555d4d99dc77c3d0bdd4e, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

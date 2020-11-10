@@ -2,25 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Move : Square
+public class Move : Piece
 {
     private Piece capture;
     private int priority = 0;
 
-    public Piece getCapture()
+    public Piece GetCapture()
     {
         return capture;
     }
-    public void setCapture(Piece pieces)
+    public void SetCapture(Piece pieces)
     {
         capture = pieces;
     }
-    public int getPriority()
+    public int GetPriority()
     {
         return priority;
     }
-    public void setPriority(int priority)
+    public void SetPriority(int priorityVal)
     {
-        this.priority = priority;
+        priority = priorityVal;
     }
 }
