@@ -1,15 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Mirror;
-using Photon.Pun;
 using UnityEngine;
 
-public class Board : MonoBehaviourPunCallbacks
+public class Board : MonoBehaviour
 {
-    public static Board Instance;
-    private PhotonView pv;
-    private Square tPiece;
-    private Move sMove;
-    
     public GameObject highlightPrefab;
     public GameObject whitePiecePrefab;
     public GameObject blackPiecePrefab;
@@ -33,25 +27,16 @@ public class Board : MonoBehaviourPunCallbacks
     private string player2Color = "Black";
 
     bool multiCapture = false;
-    
-    
-    void Awake()
-    {
-        Instance = this;
-        pv = GetComponent<PhotonView>();
-    }
-    
+    // Start is called before the first frame update
     void Start()
     {
-        // CreateBoard();
+        CreateBoard();
         //Set player1 and player2 color
     }
 
-    [PunRPC]
-    void RpcUpdateBoard()
+    void Update()
     {
-        // UpdateMouseOver();
-        pv.RPC("UpdateMouseOver", RpcTarget.All);
+        UpdateMouseOver();
 
         int x = (int)mouseOver.x;
         int y = (int)mouseOver.y;
@@ -62,17 +47,10 @@ public class Board : MonoBehaviourPunCallbacks
             {
                 Move selectedMove = CheckValid(x, y);
                 if (selectedMove != null)
-                {
-                    sMove = selectedMove;
-                    // pv.RPC("MovePiece", RpcTarget.All);
-                    MovePiece();
-                    
-                    // MovePiece(selected, selectedMove);
-                }
+                    MovePiece(selected, selectedMove);
             }
             else if (selected == null) //No pieces are selected
             {
-                // pv.RPC("SelectPiece", RpcTarget.AllBufferedViaServer, x, y);
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -82,116 +60,25 @@ public class Board : MonoBehaviourPunCallbacks
                 {
                     Move selectedMove = CheckValid(x, y);
                     if (selectedMove != null)
-                    {
-                        sMove = selectedMove;
-                        // pv.RPC("MovePiece", RpcTarget.All);
-                        MovePiece();
-                        
-                        // MovePiece(selected, selectedMove);
-                    }
+                        MovePiece(selected, selectedMove);
                 }
             }
             //DebugBoard();
         }
     }
-    
-    
-    //Move the selected piece to x,y 
-    // [PunRPC]
-    private void MovePiece()
-    {
-        Piece p = selected;
-        Move move = sMove;
-        
-        int x = move.GetX();
-        int y = move.GetY();
-        Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
-        pieces[p.GetX(), p.GetY()] = null;
-        
-        // RPC Move Possible
-        p.SetVal(x, y);
-        tPiece = p;
-        pv.RPC("MoveGameObject", RpcTarget.All);
-        // MoveGameObject();
-        
-        
-        // p.Move(x, y);
-        
-        
-        pieces[x, y] = p;
-
-        ClearHighlights();
-
-        //Delete captured piece
-        Piece capture = move.GetCapture();
-        if (capture != null) { 
-            int cX = capture.GetX();
-            int cY = capture.GetY();
-            Destroy(capture.gameObject);
-            pieces[cX, cY] = null;
-
-            //clear all moves
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Piece tmpP = pieces[i, j];
-                    if (tmpP != null)
-                        tmpP.clearMoves();
-                }
-            }
-            //find additional capture
-            findMultiCapture(x, y, x - cX, y - cY);
-        }
-
-        if (multiCapture)
-        {
-            selected.select(true);
-            DisplayMoves();
-        }
-        else 
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Piece tmpP = pieces[i, j];
-                    if (tmpP != null)
-                        tmpP.clearMoves();
-                }
-            }
-            selected.select(false);
-            selected = null;
-            turn = (turn == 1) ? 2 : 1;
-            //Display turn change
-            Debug.Log("Turn " + turn);
-
-            FindMoves();
-
-            //Check winner
-            winner();
-        }
-
-        //Promote the piece
-        if ((p.getPlayer() == 1 && y == 7) ||
-            (p.getPlayer() == 2 && y == 0))
-            p.promote();
-    }
-    
 
     //Check if the selected move is in the list of valid moves for the selected piece
     private Move CheckValid(int x, int y)
     {
         for (int i = 0; i < highlights.Count; i++)
         {
-            if (highlights[i].GetX() == x && highlights[i].GetY() == y)
+            if (highlights[i].getX() == x && highlights[i].getY() == y)
                 return highlights[i];
         }
         return null;
     }
 
     //Get mouse location
-    [PunRPC]
     private void UpdateMouseOver()
     {
         if (!Camera.main)
@@ -214,8 +101,7 @@ public class Board : MonoBehaviourPunCallbacks
     }
 
     //Create all pieces
-    [PunRPC]
-    public void RpcCreateBoard()
+    private void CreateBoard()
     {
         //Multi capture front
         /*CreatePiece(1, 1, 1);
@@ -266,16 +152,7 @@ public class Board : MonoBehaviourPunCallbacks
             p = CreatePiecePrefab(player1Color);
         else
             p = CreatePiecePrefab(player2Color);
-        
-        // RPC Move Possible
-        p.SetVal(x, y);
-        tPiece = p;
-        pv.RPC("MoveGameObject", RpcTarget.All);
-        // MoveGameObject();
-        
-        // p.Move(x,y);
-        
-        
+        p.move(x,y);
         p.setPlayer(player);
         pieces[x, y] = p;
     }
@@ -346,7 +223,73 @@ public class Board : MonoBehaviourPunCallbacks
             Debug.Log("P2 won");
     }
 
-    
+    //Move the selected piece to x,y 
+    private void MovePiece(Piece p, Move move)
+    {
+        int x = move.getX();
+        int y = move.getY();
+        Debug.Log("Moved piece " + p.getX() + " " + p.getY() + " to " + x + " " + y);
+        pieces[p.getX(), p.getY()] = null;
+        p.move(x, y);
+        pieces[x, y] = p;
+
+        ClearHighlights();
+
+        //Delete captured piece
+        Piece capture = move.getCapture();
+        if (capture != null) { 
+            int cX = capture.getX();
+            int cY = capture.getY();
+            Destroy(capture.gameObject);
+            pieces[cX, cY] = null;
+
+            //clear all moves
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Piece tmpP = pieces[i, j];
+                    if (tmpP != null)
+                        tmpP.clearMoves();
+                }
+            }
+            //find additional capture
+            findMultiCapture(x, y, x - cX, y - cY);
+        }
+
+        if (multiCapture)
+        {
+            selected.select(true);
+            DisplayMoves();
+        }
+        else 
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Piece tmpP = pieces[i, j];
+                    if (tmpP != null)
+                        tmpP.clearMoves();
+                }
+            }
+            selected.select(false);
+            selected = null;
+            turn = (turn == 1) ? 2 : 1;
+            //Display turn change
+            Debug.Log("Turn " + turn);
+
+            FindMoves();
+
+            //Check winner
+            winner();
+        }
+
+        //Promote the piece
+        if ((p.getPlayer() == 1 && y == 7) ||
+            (p.getPlayer() == 2 && y == 0))
+            p.promote();
+    }
 
     private void findMultiCapture(int x, int y, int dx, int dy)
     {
@@ -360,19 +303,9 @@ public class Board : MonoBehaviourPunCallbacks
         if (adjSquareL == 1 && jumpSquareL == 0)
         {
             Move mL = CreateMovePrefab("Move");
-            
-            // RPC Move Possible
-            mL.SetVal(x - 2, y + 2 * dy);
-            tPiece = mL;
-            pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            
-            // mL.Move(x - 2, y + 2 * dy);
-            
-            
-            mL.SetPriority(1);
-            mL.SetCapture(pieces[x - 1, y + dy]);
+            mL.move(x - 2, y + 2 * dy);
+            mL.setPriority(1);
+            mL.setCapture(pieces[x - 1, y + dy]);
             selected.addMove(mL);
             multiCapture = true;
         }
@@ -380,19 +313,9 @@ public class Board : MonoBehaviourPunCallbacks
         if (adjSquareR == 1 && jumpSquareR == 0)
         {
             Move mR = CreateMovePrefab("Move");
-            
-            // RPC Move Possible
-            mR.SetVal(x + 2, y + 2 * dy);
-            tPiece = mR;
-            pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            
-            // mR.Move(x + 2, y + 2 * dy);
-            
-            
-            mR.SetPriority(1);
-            mR.SetCapture(pieces[x + 1, y + dy]);
+            mR.move(x + 2, y + 2 * dy);
+            mR.setPriority(1);
+            mR.setCapture(pieces[x + 1, y + dy]);
             selected.addMove(mR);
             multiCapture = true;
         }
@@ -405,19 +328,9 @@ public class Board : MonoBehaviourPunCallbacks
             if (adjSquareB == 1 && jumpSquareB == 0)
             {
                 Move mB = CreateMovePrefab("Move");
-                
-                // RPC Move Possible
-                mB.SetVal(x + 2 * dx, y - 2 * dy);
-                tPiece = mB;
-                pv.RPC("MoveGameObject", RpcTarget.All);
-                // MoveGameObject();
-                
-                
-                // mB.Move(x + 2 * dx, y - 2 * dy);
-                
-                
-                mB.SetPriority(1);
-                mB.SetCapture(pieces[x + dx, y - dy]);
+                mB.move(x + 2 * dx, y - 2 * dy);
+                mB.setPriority(1);
+                mB.setCapture(pieces[x + dx, y - dy]);
                 selected.addMove(mB);
                 multiCapture = true;
             }
@@ -431,21 +344,11 @@ public class Board : MonoBehaviourPunCallbacks
         for (int i = 0; i < selected.getMovesNum(); i++)
         {
             Move h = CreateMovePrefab("Highlight");
-            int x = moves[i].GetX();
-            int y = moves[i].GetY();
-            Piece capture = moves[i].GetCapture();
-            
-            // RPC Move Possible
-            h.SetVal(x, y);
-            tPiece = h;
-            pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            
-            // h.Move(x,y);
-            
-            
-            h.SetCapture(capture);
+            int x = moves[i].getX();
+            int y = moves[i].getY();
+            Piece capture = moves[i].getCapture();
+            h.move(x,y);
+            h.setCapture(capture);
             highlights.Add(h);
         }
     }
@@ -558,48 +461,21 @@ public class Board : MonoBehaviourPunCallbacks
 
         if (adjSquare == 0) //Move
         {
-            
-            // RPC Move Possible
-            m.SetVal(x + dx, y + dy);
-            tPiece = m;
-            pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            
-            // m.Move(x + dx, y + dy);
-            
-            
-            m.SetPriority(0);
+            m.move(x + dx, y + dy);
+            m.setPriority(0);
             p.addMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0) //Capture
         {
-            
-            // RPC Move Possible
-            m.SetVal(x + 2 * dx, y + 2 * dy);
-            tPiece = m;
-            pv.RPC("MoveGameObject", RpcTarget.All);
-            // MoveGameObject();
-            
-            
-            // m.Move(x + 2 * dx, y + 2 * dy);
-            
-            
-            m.SetPriority(1);
-            m.SetCapture(pieces[x + dx, y + dy]);
+            m.move(x + 2 * dx, y + 2 * dy);
+            m.setPriority(1);
+            m.setCapture(pieces[x + dx, y + dy]);
             p.addMove(m);
         }
         else //No possible move
         {
             Destroy(m.gameObject);
         }
-    }
-
-    // TODO: Sync checkers array across clients
-    [PunRPC]
-    private void SetCheckersArray()
-    {
-        
     }
 
     //Check what is on square at (x,y)
@@ -630,11 +506,5 @@ public class Board : MonoBehaviourPunCallbacks
             str += "\n";
         }
         Debug.Log(str);
-    }
-    
-    [PunRPC]
-    private void MoveGameObject()
-    {
-        tPiece.transform.position = new Vector2(tPiece.GetX(), tPiece.GetY()) + boardOffset + pieceOffset;
     }
 }
