@@ -1,5 +1,5 @@
 # Checkers
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bcbf08c9d6af40b195ffc3e36938b66d)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ahnafnafee/Checkers&amp;utm_campaign=Badge_Grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/ahnafnafee/checkers/badge?s=547c92e01d398e85f4c810fcdc7ccb06914a5e0c)](https://www.codefactor.io/repository/github/ahnafnafee/checkers)
 
 ### Introduction
 
