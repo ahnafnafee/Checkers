@@ -53,7 +53,10 @@ public class Piece : MonoBehaviour
         if (prio > priority) //Force capture
         {
             foreach (Move m in moves)
-                Destroy(m.gameObject);
+            {
+                PhotonView pView = m.GetComponent<PhotonView>();
+                pView.RPC("DestroyPiece", RpcTarget.All);
+            }
             moves.Clear();
             priority = prio;
         }
@@ -67,8 +70,10 @@ public class Piece : MonoBehaviour
     public void ClearMoves()
     {
         foreach (Move move in moves)
-            Destroy(move.gameObject);
-
+        {
+            PhotonView pView = move.GetComponent<PhotonView>();
+            pView.RPC("DestroyPiece", RpcTarget.All);
+        }
         moves.Clear();
         priority = 0;
     }

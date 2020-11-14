@@ -22,7 +22,6 @@ public class Board : MonoBehaviourPunCallbacks
     public GameObject square;
     public GameObject move;
 
-    private Piece[,] pieces = new Piece[8, 8]; //Grid
     private Piece selected; //Selected piece (null if none selected)
 
     private List<Move> highlights = new List<Move>(); //List of all possible moves
@@ -94,24 +93,33 @@ public class Board : MonoBehaviourPunCallbacks
         }
     }
     
+    private Piece[,] GetActivePieces()
+    {
+        Piece[,] pieces = new Piece[8, 8];
+        Piece p = null;
+        foreach(Transform child in transform.Find("Pieces"))
+        {
+            p = child.GetComponent<Piece>();
+            pieces[p.GetX(), p.GetY()] = p;
+        }
+        return pieces;
+    }
+
     private void MovePiece()
     {
         Piece p = selected;
         Move move = sMove;
-        
+        Piece[,] pieces = GetActivePieces();
+
         int x = move.GetX();
         int y = move.GetY();
         Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
-        pieces[p.GetX(), p.GetY()] = null;
         
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
         pView.RPC("Move", RpcTarget.All,  x, y);
         
         // p.Move(x, y);
-        
-        
-        pieces[x, y] = p;
 
         ClearHighlights();
 
@@ -120,8 +128,10 @@ public class Board : MonoBehaviourPunCallbacks
         if (capture != null) { 
             int cX = capture.GetX();
             int cY = capture.GetY();
-            Destroy(capture.gameObject);
-            pieces[cX, cY] = null;
+
+            pView = capture.GetComponent<PhotonView>();
+            pView.RPC("DestroyPiece", RpcTarget.All);
+
 
             //clear all moves
             for (int i = 0; i < 8; i++)
@@ -275,7 +285,6 @@ public class Board : MonoBehaviourPunCallbacks
         
         
         p.SetPlayer(player);
-        pieces[x, y] = p;
     }
 
     //Select the piece return true if a piece is selected
@@ -283,7 +292,7 @@ public class Board : MonoBehaviourPunCallbacks
     {
         if (x < 0 || x > 7 || y < 0 || y > 7)
             return false;
-        Piece p = pieces[x, y];
+        Piece p = GetActivePieces()[x, y];
         if (p == null) //if the selected square contains a piece
             return false;
         if (p.GetPlayer() != turn) //if not the player's piece
@@ -315,6 +324,7 @@ public class Board : MonoBehaviourPunCallbacks
         int p1MovesCount = 0;
         int p2Count = 0;
         int p2MovesCount = 0;
+        Piece[,] pieces = GetActivePieces();
 
         for (int i = 0; i < 8; i++)
         {
@@ -349,11 +359,12 @@ public class Board : MonoBehaviourPunCallbacks
     private void findMultiCapture(int x, int y, int dx, int dy)
     {
         multiCapture = false;
+        Piece[,] pieces = GetActivePieces();
 
-        int adjSquareL = CheckSquare(x - 1, y + dy);
-        int jumpSquareL = CheckSquare(x - 2, y + 2 * dy);
-        int adjSquareR = CheckSquare(x + 1, y + dy);
-        int jumpSquareR = CheckSquare(x + 2, y + 2 * dy);
+        int adjSquareL = CheckSquare(pieces, x - 1, y + dy);
+        int jumpSquareL = CheckSquare(pieces, x - 2, y + 2 * dy);
+        int adjSquareR = CheckSquare(pieces, x + 1, y + dy);
+        int jumpSquareR = CheckSquare(pieces, x + 2, y + 2 * dy);
 
         if (adjSquareL == 1 && jumpSquareL == 0)
         {
@@ -390,8 +401,8 @@ public class Board : MonoBehaviourPunCallbacks
 
         if (selected.GetKing())
         {
-            int adjSquareB = CheckSquare(x + dx, y - dy);
-            int jumpSquareB = CheckSquare(x + 2 * dx, y - 2 * dy);
+            int adjSquareB = CheckSquare(pieces, x + dx, y - dy);
+            int jumpSquareB = CheckSquare(pieces, x + 2 * dx, y - 2 * dy);
 
             if (adjSquareB == 1 && jumpSquareB == 0)
             {
@@ -452,6 +463,7 @@ public class Board : MonoBehaviourPunCallbacks
     {
         int priority = 0;
         List<Piece> movablePieces = new List<Piece>();
+        Piece[,] pieces = GetActivePieces();
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -474,13 +486,13 @@ public class Board : MonoBehaviourPunCallbacks
                 }
 
                 //move forwards
-                CheckDirection(p, i, j, dn, up);
-                CheckDirection(p, i, j, up, up);
+                CheckDirection(p, pieces, i, j, dn, up);
+                CheckDirection(p, pieces, i, j, up, up);
 
                 if (p.GetKing()) //move backwards if the piece is a king
                 {
-                    CheckDirection(p, i, j, dn, dn);
-                    CheckDirection(p, i, j, up, dn);
+                    CheckDirection(p, pieces, i, j, dn, dn);
+                    CheckDirection(p, pieces, i, j, up, dn);
                 }
 
                 //If a capture move is available, keep only capture moves
@@ -505,8 +517,8 @@ public class Board : MonoBehaviourPunCallbacks
 
     private Piece CreateSquarePrefab(string c)
     {
-        GameObject go = PhotonNetwork.Instantiate("Square1", transform.position, Quaternion.identity);
-        go.transform.parent = transform.Find("TempObjects").transform;
+        GameObject go = PhotonNetwork.Instantiate("Square", transform.position, Quaternion.identity);
+        go.transform.parent = transform.Find("Moves").transform;
         return go.GetComponent<Piece>();
     }
     private Move CreateMovePrefab(string c)
@@ -515,11 +527,11 @@ public class Board : MonoBehaviourPunCallbacks
         switch (c)
         {
             case "Highlight":
-                go = PhotonNetwork.Instantiate("Highlight1", transform.position, Quaternion.identity);
+                go = PhotonNetwork.Instantiate("Highlight", transform.position, Quaternion.identity);
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
             default:
-                go = PhotonNetwork.Instantiate("Move1", transform.position, Quaternion.identity);
+                go = PhotonNetwork.Instantiate("Move", transform.position, Quaternion.identity);
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
         }
@@ -530,19 +542,21 @@ public class Board : MonoBehaviourPunCallbacks
         switch (c)
         {
             case "White":
-                go = PhotonNetwork.Instantiate("LightToken1", transform.position, Quaternion.identity);
+                go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
+                go.transform.parent = transform.Find("Pieces").transform;
                 return go.GetComponent<Piece>();
             default:
-                go = PhotonNetwork.Instantiate("DarkToken1", transform.position, Quaternion.identity);
+                go = PhotonNetwork.Instantiate("DarkPiece", transform.position, Quaternion.identity);
+                go.transform.parent = transform.Find("Pieces").transform;
                 return go.GetComponent<Piece>();
         }
     }
 
-    private void CheckDirection(Piece p, int x, int y, int dx, int dy)
+    private void CheckDirection(Piece p, Piece[,] pieces, int x, int y, int dx, int dy)
     {
         Move m = CreateMovePrefab("Move");
-        int adjSquare = CheckSquare(x + dx, y + dy);
-        int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
+        int adjSquare = CheckSquare(pieces, x + dx, y + dy);
+        int jumpSquare = CheckSquare(pieces, x + 2 * dx, y + 2 * dy);
 
 
         if (adjSquare == 0) //Move
@@ -589,7 +603,7 @@ public class Board : MonoBehaviourPunCallbacks
     }
 
     //Check what is on square at (x,y)
-    private int CheckSquare(int x, int y)
+    private int CheckSquare(Piece[,] pieces, int x, int y)
     {
         if (x < 0 || x > 7 || y < 0 || y > 7) //out of board
             return -1;
@@ -604,6 +618,7 @@ public class Board : MonoBehaviourPunCallbacks
     private void DebugBoard()
     {
         string str = "";
+        Piece[,] pieces = GetActivePieces();
         for (int j = 7; j >= 0; j--)
         {
             for (int i = 0; i < 8; i++)
