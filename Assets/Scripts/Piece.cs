@@ -21,6 +21,7 @@ public class Piece : MonoBehaviour
         return player;
     }
 
+    [PunRPC]
     public void SetPlayer(int player)
     {
         this.player = player;
@@ -31,6 +32,7 @@ public class Piece : MonoBehaviour
         return king;
     }
 
+    [PunRPC]
     public void Promote()
     {
         king = true;
@@ -54,8 +56,7 @@ public class Piece : MonoBehaviour
         {
             foreach (Move m in moves)
             {
-                PhotonView pView = m.GetComponent<PhotonView>();
-                pView.RPC("DestroyPiece", RpcTarget.All);
+                Destroy(m.gameObject);
             }
             moves.Clear();
             priority = prio;
@@ -69,10 +70,9 @@ public class Piece : MonoBehaviour
 
     public void ClearMoves()
     {
-        foreach (Move move in moves)
+        foreach (Move m in moves)
         {
-            PhotonView pView = move.GetComponent<PhotonView>();
-            pView.RPC("DestroyPiece", RpcTarget.All);
+            Destroy(m.gameObject);
         }
         moves.Clear();
         priority = 0;
@@ -88,12 +88,6 @@ public class Piece : MonoBehaviour
         return priority;
     }
 
-    // private void OnMouseDown()
-    // {
-    //     base.photonView.RequestOwnership();
-    // }
-
-
     public int GetX()
     {
         return X;
@@ -104,7 +98,7 @@ public class Piece : MonoBehaviour
     {
         X = x;
         Y = y;
-        transform.position = new Vector2(x, y) + boardOffset + pieceOffset;
+        transform.localPosition = (new Vector2(x, y) + boardOffset + pieceOffset)/10;
     }
 
     public void SetVal(int xVal, int yVal)
@@ -122,5 +116,12 @@ public class Piece : MonoBehaviour
     public void DestroyPiece()
     {
         Destroy(gameObject);
+    }
+
+    [PunRPC]
+    public void SetParent(int pvID)
+    {
+        PhotonView pv = PhotonView.Find(pvID);
+        transform.parent = pv.gameObject.transform.Find("Pieces").transform;
     }
 }

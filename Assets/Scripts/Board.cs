@@ -20,7 +20,7 @@ public class Board : MonoBehaviourPunCallbacks
     public GameObject whitePiecePrefab;
     public GameObject blackPiecePrefab;
     public GameObject square;
-    public GameObject move;
+    public GameObject movePrefab;
 
     private Piece selected; //Selected piece (null if none selected)
 
@@ -34,8 +34,8 @@ public class Board : MonoBehaviourPunCallbacks
     private int turn = 1; //1 = player 1; 2 = player 2
 
     //Change player color
-    private string player1Color = "White";
-    private string player2Color = "Black";
+    private string player1Color = "Black";
+    private string player2Color = "White";
 
     bool multiCapture = false;
     
@@ -49,6 +49,8 @@ public class Board : MonoBehaviourPunCallbacks
     void Start()
     {
         CreateBoard();
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
+            transform.localRotation = Quaternion.Euler(0, 0, 180);
         //Set player1 and player2 color
     }
 
@@ -62,6 +64,16 @@ public class Board : MonoBehaviourPunCallbacks
 
         if (Input.GetMouseButtonDown(0))
         {
+            DebugBoard();
+            if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+                return;
+            if (turn == 2)
+            {
+                x = 7 - x;
+                y = 7 - y;
+            }
+
+            //Check whose turn it is
             if (multiCapture)
             {
                 Move selectedMove = CheckValid(x, y);
@@ -73,6 +85,7 @@ public class Board : MonoBehaviourPunCallbacks
             }
             else if (selected == null) //No pieces are selected
             {
+                FindMoves();
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -86,6 +99,14 @@ public class Board : MonoBehaviourPunCallbacks
                         sMove = selectedMove;
                         MovePiece();
                     }
+                    if (!multiCapture)
+                    {
+                        ClearHighlights();
+                        DebugBoard();
+                        pv.RPC("CheckWin", RpcTarget.All);
+                    }
+
+
                 }
             }
             
@@ -109,7 +130,6 @@ public class Board : MonoBehaviourPunCallbacks
     {
         Piece p = selected;
         Move move = sMove;
-        Piece[,] pieces = GetActivePieces();
 
         int x = move.GetX();
         int y = move.GetY();
@@ -118,8 +138,6 @@ public class Board : MonoBehaviourPunCallbacks
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
         pView.RPC("Move", RpcTarget.All,  x, y);
-        
-        // p.Move(x, y);
 
         ClearHighlights();
 
@@ -134,15 +152,8 @@ public class Board : MonoBehaviourPunCallbacks
 
 
             //clear all moves
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Piece tmpP = pieces[i, j];
-                    if (tmpP != null)
-                        tmpP.ClearMoves();
-                }
-            }
+            ClearMoves();
+
             //find additional capture
             findMultiCapture(x, y, x - cX, y - cY);
         }
@@ -154,33 +165,42 @@ public class Board : MonoBehaviourPunCallbacks
         }
         else 
         {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Piece tmpP = pieces[i, j];
-                    if (tmpP != null)
-                        tmpP.ClearMoves();
-                }
-            }
+            ClearMoves();
+
             selected.Select(false);
             selected = null;
-            turn = (turn == 1) ? 2 : 1;
-            //Display turn change
-            Debug.Log("Turn " + turn);
 
-            FindMoves();
-
-            //Check winner
-            winner();
+            pv.RPC("ChangeTurn", RpcTarget.All);
         }
 
         //Promote the piece
         if ((p.GetPlayer() == 1 && y == 7) ||
             (p.GetPlayer() == 2 && y == 0))
-            p.Promote();
+            p.GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);
+
+        
     }
     
+    public void ClearMoves()
+    {
+        Piece[,] pieces = GetActivePieces();
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Piece tmpP = pieces[i, j];
+                if (tmpP != null)
+                    tmpP.ClearMoves();
+            }
+        }
+    }
+
+    [PunRPC]
+    public void ChangeTurn()
+    {
+        turn = (turn == 1) ? 2 : 1;
+        Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
+    }
 
     //Check if the selected move is in the list of valid moves for the selected piece
     private Move CheckValid(int x, int y)
@@ -233,39 +253,37 @@ public class Board : MonoBehaviourPunCallbacks
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 2);
             }
-            FindMoves();
             
+
+
+
+            //Multi capture front
+            /*CreatePiece(1, 1, 1);
+            CreatePiece(2, 2, 2);
+            CreatePiece(4, 4, 2);
+            CreatePiece(6, 6, 2);*/
+
+            //multi capture king
+            /*CreatePiece(6, 6, 1);
+            CreatePiece(1, 1, 2);
+            CreatePiece(3, 3, 2);
+            CreatePiece(5, 5, 2);
+            CreatePiece(1, 3, 2);
+            CreatePiece(1, 5, 2);
+            CreatePiece(3, 5, 2);
+            CreatePiece(7, 5, 2);
+            Piece[,] pieces = GetActivePieces();
+            pieces[6, 6].GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);*/
+
+            //promote mid multi capture
+            /*CreatePiece(1, 1, 1);
+            CreatePiece(3, 1, 1);
+            CreatePiece(2, 2, 2);
+            CreatePiece(4, 4, 2);
+            CreatePiece(6, 6, 2);
+            CreatePiece(2, 4, 2);
+            CreatePiece(4, 6, 2);*/
         }
-        
-        //Multi capture front
-        /*CreatePiece(1, 1, 1);
-        CreatePiece(2, 2, 2);
-        CreatePiece(4, 4, 2);
-        CreatePiece(6, 6, 2);
-        CreatePiece(2, 4, 2);
-        CreatePiece(4, 6, 2);*/
-
-        //multi capture king
-        /*CreatePiece(6, 6, 1);
-        pieces[6, 6].promote();
-        CreatePiece(1, 1, 2);
-        CreatePiece(3, 3, 2);
-        CreatePiece(5, 5, 2);
-        CreatePiece(1, 3, 2);
-        CreatePiece(1, 5, 2);
-        CreatePiece(3, 5, 2);
-        CreatePiece(7, 5, 2);*/
-
-        //promote mid multi capture
-        /*CreatePiece(1, 1, 1);
-        CreatePiece(3, 1, 1);
-        CreatePiece(2, 2, 2);
-        CreatePiece(4, 4, 2);
-        CreatePiece(6, 6, 2);
-        CreatePiece(2, 4, 2);
-        CreatePiece(4, 6, 2);*/
-
-        
     }
 
     //Create a piece at x,y
@@ -280,11 +298,10 @@ public class Board : MonoBehaviourPunCallbacks
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
         pView.RPC("Move", RpcTarget.All,  x, y);
-        
+
         // p.Move(x,y);
-        
-        
-        p.SetPlayer(player);
+
+        pView.RPC("SetPlayer", RpcTarget.All, player);
     }
 
     //Select the piece return true if a piece is selected
@@ -318,8 +335,11 @@ public class Board : MonoBehaviourPunCallbacks
         }
     }
 
-    private void winner()
+    [PunRPC]
+    private void CheckWin()
     {
+        FindMoves();
+
         int p1Count = 0;
         int p1MovesCount = 0;
         int p2Count = 0;
@@ -331,54 +351,51 @@ public class Board : MonoBehaviourPunCallbacks
             for (int j = 0; j < 8; j++)
             {
                 Piece p = pieces[i, j];
-                if (p != null)
-                {
+                if (p != null) { 
                     if (p.GetPlayer() == 1)
                     {
                         p1Count += 1;
                         p1MovesCount += p.GetMovesNum();
                     }
-                    else
+                    else if (p.GetPlayer() == 2)
                     {
                         p2Count += 1;
                         p2MovesCount += p.GetMovesNum();
                     }
-                }
-                    
+                }   
             }
         }
+        /*DebugBoard();
+        Debug.Log(p1Count + " " + p2Count + " " + p1MovesCount + " " + p2MovesCount + " turn"+turn);
+        Debug.Log(p1MovesCount == 0);
+        Debug.Log(p1MovesCount == 0 && turn == 1);*/
         //if no pieces left or no available moves
-        if (p2Count == 0 || p2MovesCount == 0 && turn == 2)
-            Debug.Log("P1 won");
-        else if (p1Count == 0 || p1MovesCount == 0 && turn == 1)
-            Debug.Log("P2 won");
-    }
+        if ((p2MovesCount == 0 && turn == 2) || p2Count == 0)
+            Debug.Log("P1 won / " + ((turn == 2) ? player1Color : player2Color));
+        else if ((p1MovesCount == 0 && turn == 1) || p1Count == 0)
+            Debug.Log("P2 won / " + ((turn == 2) ? player1Color : player2Color));
 
-    
+        ClearMoves();
+    }
 
     private void findMultiCapture(int x, int y, int dx, int dy)
     {
         multiCapture = false;
         Piece[,] pieces = GetActivePieces();
 
-        int adjSquareL = CheckSquare(pieces, x - 1, y + dy);
-        int jumpSquareL = CheckSquare(pieces, x - 2, y + 2 * dy);
-        int adjSquareR = CheckSquare(pieces, x + 1, y + dy);
-        int jumpSquareR = CheckSquare(pieces, x + 2, y + 2 * dy);
+        int adjSquareL = CheckSquare(x - 1, y + dy);
+        int jumpSquareL = CheckSquare(x - 2, y + 2 * dy);
+        int adjSquareR = CheckSquare(x + 1, y + dy);
+        int jumpSquareR = CheckSquare(x + 2, y + 2 * dy);
 
         if (adjSquareL == 1 && jumpSquareL == 0)
         {
             Move mL = CreateMovePrefab("Move");
-            
-            // NetSynced Move / Client ?
-            // PhotonView pView = mL.GetComponent<PhotonView>();
-            // pView.RPC("Move", RpcTarget.All,  x - 2, y + 2 * dy);
-            
-            mL.Move(x - 2, y + 2 * dy);
-            
-            
+            mL.MoveObj(x - 2, y + 2 * dy);
+
             mL.SetPriority(1);
             mL.SetCapture(pieces[x - 1, y + dy]);
+
             selected.AddMove(mL);
             multiCapture = true;
         }
@@ -386,33 +403,25 @@ public class Board : MonoBehaviourPunCallbacks
         if (adjSquareR == 1 && jumpSquareR == 0)
         {
             Move mR = CreateMovePrefab("Move");
-            
-            // NetSynced Move / Client ?
-            // PhotonView pView = mR.GetComponent<PhotonView>();
-            // pView.RPC("Move", RpcTarget.All,  x + 2, y + 2 * dy);
-            
-            mR.Move(x + 2, y + 2 * dy);
+            mR.MoveObj(x + 2, y + 2 * dy);
             
             mR.SetPriority(1);
             mR.SetCapture(pieces[x + 1, y + dy]);
+
             selected.AddMove(mR);
             multiCapture = true;
         }
 
         if (selected.GetKing())
         {
-            int adjSquareB = CheckSquare(pieces, x + dx, y - dy);
-            int jumpSquareB = CheckSquare(pieces, x + 2 * dx, y - 2 * dy);
+            int adjSquareB = CheckSquare(x + dx, y - dy);
+            int jumpSquareB = CheckSquare(x + 2 * dx, y - 2 * dy);
 
             if (adjSquareB == 1 && jumpSquareB == 0)
             {
                 Move mB = CreateMovePrefab("Move");
                 
-                // NetSynced Move / Client ?
-                // PhotonView pView = mB.GetComponent<PhotonView>();
-                // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y - 2 * dy);
-                
-                mB.Move(x + 2 * dx, y - 2 * dy);
+                mB.MoveObj(x + 2 * dx, y - 2 * dy);
                 
                 mB.SetPriority(1);
                 mB.SetCapture(pieces[x + dx, y - dy]);
@@ -432,12 +441,8 @@ public class Board : MonoBehaviourPunCallbacks
             int x = moves[i].GetX();
             int y = moves[i].GetY();
             Piece capture = moves[i].GetCapture();
-            
-            // NetSynced Move / Client ?
-            // PhotonView pView = h.GetComponent<PhotonView>();
-            // pView.RPC("Move", RpcTarget.All,  x, y);
 
-            h.Move(x,y);
+            h.MoveObj(x,y);
             
             h.SetCapture(capture);
             highlights.Add(h);
@@ -450,9 +455,8 @@ public class Board : MonoBehaviourPunCallbacks
         for (int i = 0; i < highlights.Count; i++)
         {
             // NetSynced Destroy
-            PhotonView pView = highlights[i].GetComponent<PhotonView>();
-            pView.RPC("DestroyPiece", RpcTarget.All);
-            // Destroy(highlights[i].gameObject);
+
+            Destroy(highlights[i].gameObject);
         }
 
         highlights.Clear();
@@ -486,13 +490,13 @@ public class Board : MonoBehaviourPunCallbacks
                 }
 
                 //move forwards
-                CheckDirection(p, pieces, i, j, dn, up);
-                CheckDirection(p, pieces, i, j, up, up);
+                CheckDirection(p, i, j, dn, up);
+                CheckDirection(p, i, j, up, up);
 
                 if (p.GetKing()) //move backwards if the piece is a king
                 {
-                    CheckDirection(p, pieces, i, j, dn, dn);
-                    CheckDirection(p, pieces, i, j, up, dn);
+                    CheckDirection(p, i, j, dn, dn);
+                    CheckDirection(p, i, j, up, dn);
                 }
 
                 //If a capture move is available, keep only capture moves
@@ -515,23 +519,23 @@ public class Board : MonoBehaviourPunCallbacks
         }
     }
 
-    private Piece CreateSquarePrefab(string c)
+    /*private Piece CreateSquarePrefab(string c)
     {
         GameObject go = PhotonNetwork.Instantiate("Square", transform.position, Quaternion.identity);
         go.transform.parent = transform.Find("Moves").transform;
         return go.GetComponent<Piece>();
-    }
+    }*/
     private Move CreateMovePrefab(string c)
     {
         GameObject go;
         switch (c)
-        {
+        { //SHOULD BE LOCAL
             case "Highlight":
-                go = PhotonNetwork.Instantiate("Highlight", transform.position, Quaternion.identity);
+                go = Instantiate(highlightPrefab, transform.position, Quaternion.identity);
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
             default:
-                go = PhotonNetwork.Instantiate("Move", transform.position, Quaternion.identity);
+                go = Instantiate(movePrefab, transform.position, Quaternion.identity);
                 go.transform.parent = transform.Find("Moves").transform;
                 return go.GetComponent<Move>();
         }
@@ -539,24 +543,29 @@ public class Board : MonoBehaviourPunCallbacks
     private Piece CreatePiecePrefab(string c)
     {
         GameObject go;
+        PhotonView pView;
         switch (c)
-        {
+        { //SHOULD BE GLOBAL
             case "White":
                 go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
-                go.transform.parent = transform.Find("Pieces").transform;
+                pView = go.GetComponent<PhotonView>();
+                pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
                 return go.GetComponent<Piece>();
             default:
                 go = PhotonNetwork.Instantiate("DarkPiece", transform.position, Quaternion.identity);
-                go.transform.parent = transform.Find("Pieces").transform;
+                pView = go.GetComponent<PhotonView>();
+                pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
                 return go.GetComponent<Piece>();
         }
     }
 
-    private void CheckDirection(Piece p, Piece[,] pieces, int x, int y, int dx, int dy)
+    private void CheckDirection(Piece p, int x, int y, int dx, int dy)
     {
+        Piece[,] pieces = GetActivePieces();
         Move m = CreateMovePrefab("Move");
-        int adjSquare = CheckSquare(pieces, x + dx, y + dy);
-        int jumpSquare = CheckSquare(pieces, x + 2 * dx, y + 2 * dy);
+
+        int adjSquare = CheckSquare(x + dx, y + dy);
+        int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
 
 
         if (adjSquare == 0) //Move
@@ -566,7 +575,7 @@ public class Board : MonoBehaviourPunCallbacks
             // PhotonView pView = m.GetComponent<PhotonView>();
             // pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
             
-            m.Move(x + dx, y + dy);
+            m.MoveObj(x + dx, y + dy);
             
             
             m.SetPriority(0);
@@ -579,7 +588,7 @@ public class Board : MonoBehaviourPunCallbacks
             // PhotonView pView = m.GetComponent<PhotonView>();
             // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
             
-            m.Move(x + 2 * dx, y + 2 * dy);
+            m.MoveObj(x + 2 * dx, y + 2 * dy);
             
             
             m.SetPriority(1);
@@ -589,9 +598,8 @@ public class Board : MonoBehaviourPunCallbacks
         else //No possible move
         {
             // NetSynced Destroy
-            PhotonView pView = m.GetComponent<PhotonView>();
-            pView.RPC("DestroyPiece", RpcTarget.All);
-            // Destroy(m.gameObject);
+
+            Destroy(m.gameObject);
         }
     }
 
@@ -603,8 +611,9 @@ public class Board : MonoBehaviourPunCallbacks
     }
 
     //Check what is on square at (x,y)
-    private int CheckSquare(Piece[,] pieces, int x, int y)
+    private int CheckSquare(int x, int y)
     {
+        Piece[,] pieces = GetActivePieces();
         if (x < 0 || x > 7 || y < 0 || y > 7) //out of board
             return -1;
         if (pieces[x, y] == null) //no piece

@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: -1200668762375583199}
   - component: {fileID: 6214243779997536672}
   m_Layer: 0
-  m_Name: LightToken1
+  m_Name: LightPiece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

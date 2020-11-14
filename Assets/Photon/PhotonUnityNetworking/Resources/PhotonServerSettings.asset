@@ -48,6 +48,19 @@ MonoBehaviour:
   - SetCheckersArray
   - Move
   - DestroyPiece
+  - CreateMovePrefab
+  - CreatePiecePrefab
+  - CreateSquarePrefab
+  - Select
+  - DisplayMoves
+  - Promote
+  - ClearHighlights
+  - SetParent
+  - ChangeTurn
+  - FindMoves
+  - SetPlayer
+  - AddMove
+  - ClearMoves
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
