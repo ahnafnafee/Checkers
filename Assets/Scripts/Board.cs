@@ -103,14 +103,13 @@ public class Board : MonoBehaviourPunCallbacks
                     {
                         ClearHighlights();
                         DebugBoard();
-                        pv.RPC("CheckWin", RpcTarget.All);
+
+                        //Wait 0.1 sec second and check if valid 
+                        //might need more testing depending on ping
+                        Invoke(nameof(CheckWin), 0.1f);
                     }
-
-
                 }
             }
-            
-            //DebugBoard();
         }
     }
     
@@ -149,7 +148,6 @@ public class Board : MonoBehaviourPunCallbacks
 
             pView = capture.GetComponent<PhotonView>();
             pView.RPC("DestroyPiece", RpcTarget.All);
-
 
             //clear all moves
             ClearMoves();
@@ -261,7 +259,8 @@ public class Board : MonoBehaviourPunCallbacks
             /*CreatePiece(1, 1, 1);
             CreatePiece(2, 2, 2);
             CreatePiece(4, 4, 2);
-            CreatePiece(6, 6, 2);*/
+            CreatePiece(6, 6, 2);
+            CreatePiece(5, 7, 2);*/
 
             //multi capture king
             /*CreatePiece(6, 6, 1);
@@ -335,7 +334,6 @@ public class Board : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
     private void CheckWin()
     {
         FindMoves();
@@ -370,12 +368,19 @@ public class Board : MonoBehaviourPunCallbacks
         Debug.Log(p1MovesCount == 0);
         Debug.Log(p1MovesCount == 0 && turn == 1);*/
         //if no pieces left or no available moves
-        if ((p2MovesCount == 0 && turn == 2) || p2Count == 0)
-            Debug.Log("P1 won / " + ((turn == 2) ? player1Color : player2Color));
-        else if ((p1MovesCount == 0 && turn == 1) || p1Count == 0)
-            Debug.Log("P2 won / " + ((turn == 2) ? player1Color : player2Color));
+        if (p2Count == 0 || (p2MovesCount == 0 && turn == 2)) //p1 win
+            pv.RPC("EndGame", RpcTarget.All, 1);
+        else if (p1Count == 0 || (p1MovesCount == 0 && turn == 1)) //p2 win
+            pv.RPC("EndGame", RpcTarget.All, 2);
 
         ClearMoves();
+    }
+
+    //After a person wins announce to both players 
+    [PunRPC]
+    private void EndGame(int player)
+    {
+        Debug.Log("P"+ player + " won / " + ((player == 1) ? player1Color : player2Color));
     }
 
     private void findMultiCapture(int x, int y, int dx, int dy)
