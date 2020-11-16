@@ -12,11 +12,19 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Return) && SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            SceneManager.LoadSceneAsync(1);
+        }
     }
 
     public void RestartScene()
     {
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().path);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

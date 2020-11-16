@@ -1,16 +1,9 @@
 using System.Collections.Generic;
-using Mirror;
 using Photon.Pun;
 using UnityEngine;
 
 public class Board : MonoBehaviourPunCallbacks
 {
-    // TODO: Piece should be selectable by BOTH players
-    // TODO: Move and highlight objects should be client side
-    // TODO: Fix highlight spawn on other client
-    // TODO: Piece array needs to be synced
-    // TODO: Implement server side turn manager (Look into PunTurnManager)
-
     public static Board Instance;
     private PhotonView pv;
     private Piece tPiece;
