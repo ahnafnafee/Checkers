@@ -11,24 +11,35 @@ namespace Lobby.Scripts
     {
         public static Launcher Instance;
         
-        [SerializeField] TMP_InputField roomNameInputField;
-        [SerializeField] TMP_Text errorText;
-        [SerializeField] TMP_Text roomNameText;
-        [SerializeField] Transform roomListContent;
-        [SerializeField] GameObject roomListItemPrefab;
-        [SerializeField] Transform playerListContent;
-        [SerializeField] GameObject playerListItemPrefab;
-        [SerializeField] GameObject startGameButton;
+        [SerializeField] TMP_InputField roomNameInputField = default;
+        [SerializeField] TMP_Text errorText = default;
+        [SerializeField] TMP_Text roomNameText = default;
+        [SerializeField] Transform roomListContent = default;
+        [SerializeField] GameObject roomListItemPrefab = default;
+        [SerializeField] Transform playerListContent = default;
+        [SerializeField] GameObject playerListItemPrefab = default;
+        [SerializeField] GameObject startGameButton = default;
         
         void Awake()
         {
+            // Ensures there is only 1 Launcher
+            if(Instance)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            DontDestroyOnLoad(gameObject);
             Instance = this;
         }
         
         void Start()
         {
-            Debug.Log("Connected to Server");
-            PhotonNetwork.ConnectUsingSettings();
+            if (PhotonNetwork.IsConnected == false)
+            {
+                Debug.Log("Connected to Server");
+                PhotonNetwork.ConnectUsingSettings();
+            }
+            
         }
 
         public override void OnConnectedToMaster()
@@ -91,11 +102,6 @@ namespace Lobby.Scripts
         
         public void StartGame()
         {
-            // if (PhotonNetwork.IsMasterClient)
-            // {
-            //     PhotonNetwork.LoadLevel(1);
-            // }
-            
             PhotonNetwork.LoadLevel(2);
         }
         

@@ -1,90 +1,101 @@
 using System.Collections.Generic;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 public class Board : MonoBehaviourPunCallbacks
 {
     public static Board Instance;
-    private PhotonView pv;
-    private Piece tPiece;
-    private Move sMove;
     
-    public GameObject highlightPrefab;
-    public GameObject whitePiecePrefab;
-    public GameObject blackPiecePrefab;
-    public GameObject square;
-    public GameObject movePrefab;
-
-    private Piece selected; //Selected piece (null if none selected)
-
-    private List<Move> highlights = new List<Move>(); //List of all possible moves
-
+    [Header("Instantiable Prefabs")]
+    public GameObject blackPiecePrefab = default;
+    public GameObject whitePiecePrefab = default;
+    public GameObject highlightPrefab = default;
+    public GameObject movePrefab = default;
+    public GameObject square = default;
+    
+    [Header("Board Attributes")]
+    private PhotonView pv = default;
+    private Vector2 mouseOver = default;
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
-    private Vector2 mouseOver;
-
-    private int turn = 1; //1 = player 1; 2 = player 2
-
-    //Change player color
-    private string player1Color = "Black";
-    private string player2Color = "White";
-
+    [Header("Piece Attributes")]
+    private bool isClickable = true;
     bool multiCapture = false;
+    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
+    private Piece tPiece = default;
+    private Piece selected = default; //Selected piece (null if none selected)
+    private Move sMove = default;
+    private List<Move> highlights = new List<Move>(); //List of all possible moves
     
+    [Header("Player Attributes")]
+    //Change player color
+    private string player1Color = "Dark";
+    private string player2Color = "Light";
+    private int turn = 1; //1 = player 1; 2 = player 2
     
+    [Header("GUI")]
+    public GameObject winGUI = default;
+    public TextMeshProUGUI winText = default;
+
+
     void Awake()
     {
         Instance = this;
         pv = GetComponent<PhotonView>();
     }
-    
+
     void Start()
     {
+        // Default conditions
+        Time.timeScale = 1;
+        isClickable = true;
+        
         CreateBoard();
         if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
             transform.localRotation = Quaternion.Euler(0, 0, 180);
         //Set player1 and player2 color
+        winGUI.SetActive(false);
     }
 
     // [PunRPC]
     void Update()
     {
         UpdateMouseOver();
+        
+        // For debugging wins
+        DebugWin();
+        
+        // For clicking pieces
+        ClickPiece();
 
-        int x = (int)mouseOver.x;
-        int y = (int)mouseOver.y;
+    }
 
-        if (Input.GetMouseButtonDown(0))
+    public void RestartScene()
+    {
+        
+    }
+
+    private void ClickPiece()
+    {
+        if (isClickable)
         {
-            DebugBoard();
-            if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
-                return;
-            if (turn == 2)
-            {
-                x = 7 - x;
-                y = 7 - y;
-            }
+            int x = (int)mouseOver.x;
+            int y = (int)mouseOver.y;
 
-            //Check whose turn it is
-            if (multiCapture)
+            if (Input.GetMouseButtonDown(0))
             {
-                Move selectedMove = CheckValid(x, y);
-                if (selectedMove != null)
+                DebugBoard();
+                if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+                    return;
+                if (turn == 2)
                 {
-                    sMove = selectedMove;
-                    MovePiece();
+                    x = 7 - x;
+                    y = 7 - y;
                 }
-            }
-            else if (selected == null) //No pieces are selected
-            {
-                FindMoves();
-                SelectPiece(x, y);
-            }
-            else //A piece is already selected
-            {
-                selected.Select(false);
-                if (!SelectPiece(x, y)) //If not selecting another piece
+
+                //Check whose turn it is
+                if (multiCapture)
                 {
                     Move selectedMove = CheckValid(x, y);
                     if (selectedMove != null)
@@ -92,20 +103,39 @@ public class Board : MonoBehaviourPunCallbacks
                         sMove = selectedMove;
                         MovePiece();
                     }
-                    if (!multiCapture)
+                }
+                else if (selected == null) //No pieces are selected
+                {
+                    FindMoves();
+                    SelectPiece(x, y);
+                }
+                else //A piece is already selected
+                {
+                    selected.Select(false);
+                    if (!SelectPiece(x, y)) //If not selecting another piece
                     {
-                        ClearHighlights();
-                        DebugBoard();
+                        Move selectedMove = CheckValid(x, y);
+                        if (selectedMove != null)
+                        {
+                            sMove = selectedMove;
+                            MovePiece();
+                        }
+                        if (!multiCapture)
+                        {
+                            ClearHighlights();
+                            DebugBoard();
 
-                        //Wait 0.1 sec second and check if valid 
-                        //might need more testing depending on ping
-                        Invoke(nameof(CheckWin), 0.1f);
+                            //Wait 0.1 sec second and check if valid 
+                            //might need more testing depending on ping
+                            Invoke(nameof(CheckWin), 0.1f);
+                        }
                     }
                 }
             }
         }
+        
     }
-    
+
     private Piece[,] GetActivePieces()
     {
         Piece[,] pieces = new Piece[8, 8];
@@ -171,7 +201,7 @@ public class Board : MonoBehaviourPunCallbacks
 
         
     }
-    
+
     public void ClearMoves()
     {
         Piece[,] pieces = GetActivePieces();
@@ -369,10 +399,26 @@ public class Board : MonoBehaviourPunCallbacks
         ClearMoves();
     }
 
+    void DebugWin()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            pv.RPC("EndGame", RpcTarget.All, 1);
+        } else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            pv.RPC("EndGame", RpcTarget.All, 2);
+        }
+        ClearMoves();
+    }
+
     //After a person wins announce to both players 
     [PunRPC]
     private void EndGame(int player)
     {
+        Time.timeScale = 0;
+        winGUI.SetActive(true);
+        isClickable = false;
+        winText.text = "Player " + player + " (" + ((player == 1) ? player1Color : player2Color) + ") wins";
         Debug.Log("P"+ player + " won / " + ((player == 1) ? player1Color : player2Color));
     }
 
@@ -538,13 +584,14 @@ public class Board : MonoBehaviourPunCallbacks
                 return go.GetComponent<Move>();
         }
     }
+
     private Piece CreatePiecePrefab(string c)
     {
         GameObject go;
         PhotonView pView;
         switch (c)
         { //SHOULD BE GLOBAL
-            case "White":
+            case "Light":
                 go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
                 pView = go.GetComponent<PhotonView>();
                 pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
@@ -639,7 +686,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
         Debug.Log(str);
     }
-    
+
     [PunRPC]
     private void MoveGameObject()
     {

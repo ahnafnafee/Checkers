@@ -7,7 +7,7 @@ namespace Lobby.Scripts
 {
     public class PlayerListItem : MonoBehaviourPunCallbacks
     {
-        [SerializeField] TMP_Text text;
+        [SerializeField] TMP_Text text = default;
         Player player;
 
         public void SetUp(Player _player)

@@ -6,7 +6,7 @@ namespace Lobby.Scripts
 {
     public class RoomListItem : MonoBehaviour
     {
-        [SerializeField] TMP_Text text;
+        [SerializeField] TMP_Text text = default;
 
         public RoomInfo info;
 

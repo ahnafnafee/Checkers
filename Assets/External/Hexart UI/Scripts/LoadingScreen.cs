@@ -41,7 +41,7 @@ namespace Michsky.UI.Hexart
         public string titleDescText;
         [Range(0.1f, 10)] public float fadingAnimationSpeed = 2.0f;
 
-        private bool isHintAlphaZero;
+        private bool isHintAlphaZero = default;
 
         void Start()
         {

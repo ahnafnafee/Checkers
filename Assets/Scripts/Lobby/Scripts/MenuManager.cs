@@ -10,9 +10,9 @@ namespace Lobby.Scripts
     public class MenuManager : MonoBehaviour
     {
         public static MenuManager Instance;
-        [SerializeField] Button startGameButton;
+        [SerializeField] Button startGameButton = default;
 
-        [SerializeField] Menu[] menus;
+        [SerializeField] Menu[] menus = default;
 
         void Awake()
         {
