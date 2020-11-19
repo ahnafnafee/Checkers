@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Board : MonoBehaviourPunCallbacks
 {
@@ -36,6 +38,7 @@ public class Board : MonoBehaviourPunCallbacks
     
     [Header("GUI")]
     public GameObject winGUI = default;
+    public GameObject restartBtn = default;
     public TextMeshProUGUI winText = default;
 
 
@@ -48,7 +51,6 @@ public class Board : MonoBehaviourPunCallbacks
     void Start()
     {
         // Default conditions
-        Time.timeScale = 1;
         isClickable = true;
         
         CreateBoard();
@@ -61,6 +63,10 @@ public class Board : MonoBehaviourPunCallbacks
     // [PunRPC]
     void Update()
     {
+        // Enforces player to go back to lobby
+        // if player count is less or equal to 11
+        CheckPlayerNum();
+        
         UpdateMouseOver();
         
         // For debugging wins
@@ -71,10 +77,33 @@ public class Board : MonoBehaviourPunCallbacks
 
     }
 
-    public void RestartScene()
+    private void CheckPlayerNum()
     {
+        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
+        {
+            restartBtn.SetActive(false);
+        }
         
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        {
+            restartBtn.SetActive(true);
+        }
     }
+
+
+    public void RestartGame()
+    {
+        PhotonNetwork.DestroyAll();
+        pv.RPC("RpcRestart", RpcTarget.All);
+    }
+    
+    [PunRPC]
+    private void RpcRestart()
+    {
+        winGUI.SetActive(false);
+        PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
+    }
+    
 
     private void ClickPiece()
     {
@@ -263,7 +292,7 @@ public class Board : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("ONLY MASTER");
-            
+
             for (int y = 0; y < 3; y++)
             {
                 for (int x = 0; x < 8; x += 2)
@@ -305,6 +334,10 @@ public class Board : MonoBehaviourPunCallbacks
             CreatePiece(6, 6, 2);
             CreatePiece(2, 4, 2);
             CreatePiece(4, 6, 2);*/
+        }
+        else
+        {
+            restartBtn.SetActive(false);
         }
     }
 
@@ -415,7 +448,6 @@ public class Board : MonoBehaviourPunCallbacks
     [PunRPC]
     private void EndGame(int player)
     {
-        Time.timeScale = 0;
         winGUI.SetActive(true);
         isClickable = false;
         winText.text = "Player " + player + " (" + ((player == 1) ? player1Color : player2Color) + ") wins";

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -41,6 +42,12 @@ namespace Lobby.Scripts
                 Debug.Log("Instantiated PlayerPrefab");
                 PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero, Quaternion.identity);
             }
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            base.OnPlayerLeftRoom(otherPlayer);
+            Debug.Log(otherPlayer.NickName + " has left the game");
         }
     }
 }

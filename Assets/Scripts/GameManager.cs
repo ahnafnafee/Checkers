@@ -5,13 +5,8 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -22,64 +17,29 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    IEnumerator DoSwitchLevel (int level)
+    public void RestartGame()
     {
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.DestroyAll();
+        PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
+    }
+    
+    public void LoadLobby()
+    {
+        StartCoroutine(DisconnectAndLoad());
+    }
+    
+    IEnumerator DisconnectAndLoad()
+    {
         PhotonNetwork.Disconnect();
         while (PhotonNetwork.IsConnected)
         {
+            Debug.Log($"Within While Loop: {PhotonNetwork.IsConnected}");
             yield return null;
         }
 
-        SceneManager.LoadSceneAsync(level);
-    }
-
-    public void LoadLobby()
-    {
-        // StartCoroutine(DisconnectAndLoad());
-        
-        
-        // PhotonNetwork.LoadLevel(1);
-        
-        PhotonNetwork.LeaveRoom();
-        
-        // PhotonNetwork.LeaveRoom();
-        // PhotonNetwork.LeaveLobby();
-        // PhotonNetwork.Disconnect();
+        SceneManager.LoadScene(1);
     }
     
-    public void LeaveRoom()
-    {
-        PhotonNetwork.LeaveRoom();
-    }
-
-    // IEnumerator DisconnectAndLoad()
-    // {
-    //     PhotonNetwork.LeaveRoom();
-    //     
-    //
-    //     while (PhotonNetwork.InRoom && PhotonNetwork.IsConnected)
-    //     {
-    //         Debug.Log("Disconnecting");
-    //         yield return null;
-    //     }
-    //     SceneManager.LoadScene(1);
-    //     
-    // }
-
-    // public override void OnDisconnected(DisconnectCause cause)
-    // {
-    //     Debug.Log(cause);
-    //     SceneManager.LoadSceneAsync(1);
-    // }
-
-    public override void OnLeftRoom()
-    {
-        PhotonNetwork.Disconnect();
-        SceneManager.LoadSceneAsync(1);
-        // SceneManager.LoadScene(1);
-        // base.OnLeftRoom();
-    }
     
 
     public void RestartScene()

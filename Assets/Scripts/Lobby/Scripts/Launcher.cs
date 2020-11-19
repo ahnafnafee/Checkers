@@ -34,6 +34,8 @@ namespace Lobby.Scripts
         
         void Start()
         {
+            Debug.Log($"Network: {PhotonNetwork.IsConnected}");
+            Debug.Log($"Room: {PhotonNetwork.InRoom}");
             if (PhotonNetwork.IsConnected == false)
             {
                 Debug.Log("Connected to Server");
@@ -62,7 +64,11 @@ namespace Lobby.Scripts
             {
                 return;
             }
-            PhotonNetwork.CreateRoom(roomNameInputField.text);
+            
+            // Room attributes
+            RoomOptions roomOps = new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = 2};
+            
+            PhotonNetwork.CreateRoom(roomNameInputField.text, roomOps);
             MenuManager.Instance.OpenMenu("loading");
         }
         
@@ -70,7 +76,6 @@ namespace Lobby.Scripts
         {
             MenuManager.Instance.OpenMenu("room");
             roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-            PhotonNetwork.CurrentRoom.MaxPlayers = 2;
             
             Player[] players = PhotonNetwork.PlayerList;
 
@@ -134,8 +139,18 @@ namespace Lobby.Scripts
             {
                 if(roomList[i].RemovedFromList)
                     continue;
+                
+                if (roomList[i].PlayerCount == 2)
+                    continue;
+                
                 Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
             }
+        }
+        
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            base.OnPlayerLeftRoom(otherPlayer);
+            Debug.Log(otherPlayer.NickName + " has left the game");
         }
         
         public override void OnPlayerEnteredRoom(Player newPlayer)
