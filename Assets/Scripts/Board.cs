@@ -95,10 +95,12 @@ public class Board : MonoBehaviourPunCallbacks
             {
                 pv.RPC("EndGame", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
                 Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
+                PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
-                // gm.LoadLobby();
-            } else if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && gameCompleted)
+            } 
+            else if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && gameCompleted)
             {
+                PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
             }
 
