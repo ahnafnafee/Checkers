@@ -65,6 +65,8 @@ public class Board : MonoBehaviourPunCallbacks
             transform.localRotation = Quaternion.Euler(0, 0, 180);
         //Set player1 and player2 color
         winGUI.SetActive(false);
+        
+        Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
     }
 
     void Update()
@@ -85,8 +87,9 @@ public class Board : MonoBehaviourPunCallbacks
 
     private void CheckPlayerNum()
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
+        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
         {
+            pv.RPC("EndGame", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
             Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
             restartBtn.SetActive(false);
             // gm.LoadLobby();
