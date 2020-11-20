@@ -344,7 +344,7 @@ public class Board : MonoBehaviourPunCallbacks
         {
             Debug.Log("ONLY MASTER");
 
-            /*for (int y = 0; y < 3; y++)
+            for (int y = 0; y < 3; y++)
             {
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 1);
@@ -354,14 +354,14 @@ public class Board : MonoBehaviourPunCallbacks
             {
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 2);
-            }*/
+            }
             //Multi capture front
-            CreatePiece(1, 1, 1);
+            /*CreatePiece(1, 1, 1);
             CreatePiece(3, 1, 1);
             CreatePiece(2, 2, 2);
             CreatePiece(4, 4, 2);
             CreatePiece(6, 6, 2);
-            CreatePiece(5, 7, 2);
+            CreatePiece(5, 7, 2);*/
 
             //multi capture king
             /*CreatePiece(6, 6, 1);
