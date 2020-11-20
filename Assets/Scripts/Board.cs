@@ -578,9 +578,13 @@ public class Board : MonoBehaviourPunCallbacks
                 }
 
                 if (prio >= priority)
+                {
                     movablePieces.Add(p);
+                }
                 else
+                {
                     p.ClearMoves();
+                }
             }
         }
     }
