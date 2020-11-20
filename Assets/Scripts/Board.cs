@@ -82,7 +82,6 @@ public class Board : MonoBehaviourPunCallbacks
 
         // For debugging wins
         DebugWin();
-
         // For clicking pieces
         ClickPiece();
     }
@@ -170,7 +169,6 @@ public class Board : MonoBehaviourPunCallbacks
             }
             else if (selected == null) //No pieces are selected
             {
-                FindMoves();
                 SelectPiece(x, y);
             }
             else //A piece is already selected
@@ -256,6 +254,7 @@ public class Board : MonoBehaviourPunCallbacks
             selected.Select(false);
             selected = null;
 
+            HighlightMovable();
             pv.RPC("ChangeTurn", RpcTarget.All);
         }
 
@@ -263,6 +262,7 @@ public class Board : MonoBehaviourPunCallbacks
         if ((p.GetPlayer() == 1 && y == 7) ||
             (p.GetPlayer() == 2 && y == 0))
             p.GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);
+
     }
 
     public void ClearMoves()
@@ -296,9 +296,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
         
         Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
-        if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
-            return;
-        FindMoves();
+        Invoke(nameof(FindMoves), 0.1f);
     }
 
     //Check if the selected move is in the list of valid moves for the selected piece
@@ -440,8 +438,6 @@ public class Board : MonoBehaviourPunCallbacks
 
     private void CheckWin()
     {
-        FindMoves();
-
         int p1Count = 0;
         int p1MovesCount = 0;
         int p2Count = 0;
@@ -636,18 +632,13 @@ public class Board : MonoBehaviourPunCallbacks
                 }
 
                 if (prio >= priority)
-                {
                     movablePieces.Add(p);
-                }
                 else
-                {
                     p.ClearMoves();
-                }
             }
         }
-        if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
-            return;
-        HighlightMovable();
+        if (PhotonNetwork.LocalPlayer.ActorNumber == turn)
+            HighlightMovable(); 
     }
 
     private void HighlightMovable()
@@ -661,11 +652,9 @@ public class Board : MonoBehaviourPunCallbacks
                 if (p == null)
                     continue;
                 if (p.GetMovesNum() == 0)
-                {
                     p.HighlightPiece(false);
-                    continue;
-                }
-                p.HighlightPiece(true);
+                else
+                    p.HighlightPiece(true);
             }
         }
     }
