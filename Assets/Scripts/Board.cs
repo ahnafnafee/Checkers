@@ -10,47 +10,42 @@ public class Board : MonoBehaviourPunCallbacks
 
     [Header("Instantiable Prefabs")] 
     public GameObject blackPiecePrefab = default;
-
-    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-
-    private bool gameCompleted = default;
+    public GameObject whitePiecePrefab = default;
+    public GameObject highlightPrefab = default;
+    public GameObject movePrefab = default;
 
     [Header("Game Manager")] 
     private GameManager gm;
-
-    public GameObject highlightPrefab = default;
+    private Vector2 mouseOver = default;
     private List<Move> highlights = new List<Move>(); //List of all possible moves
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
-
-    public GameObject jmpInterface;
-    private Vector2 mouseOver = default;
-    public GameObject movePrefab = default;
+    public GameObject square = default;
+    private Piece tPiece = default;
+    private Piece selected = default; //Selected piece (null if none selected)
+    private Move sMove = default;
     bool multiCapture = false;
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
     [Header("Player Attributes")]
     //Change player color
     private string player1Color = "Dark";
-
     private string player2Color = "Light";
     private int priority = default;
 
     [Header("Board Attributes")] 
     private PhotonView pv = default;
-
-    public GameObject restartBtn = default;
-    private Piece selected = default; //Selected piece (null if none selected)
-    private Move sMove = default;
-    public GameObject square = default;
-    private Piece tPiece = default;
     private int turn = 1; //1 = player 1; 2 = player 2
-    public GameObject whitePiecePrefab = default;
+    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
+    private bool gameCompleted = default;
 
     [Header("GUI")] 
     public GameObject winGUI = default;
-
+    public GameObject restartBtn = default;
+    public GameObject jmpInterface = default;
+    public GameObject playerSelected1 = default;
+    public GameObject playerSelected2 = default;
     public TextMeshProUGUI winText = default;
 
 
@@ -65,6 +60,8 @@ public class Board : MonoBehaviourPunCallbacks
         // Default conditions
         isClickable = true;
         gameCompleted = false;
+        playerSelected1.SetActive(true);
+        playerSelected2.SetActive(false);
 
         CreateBoard();
         if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
@@ -93,18 +90,25 @@ public class Board : MonoBehaviourPunCallbacks
 
     private void CheckPlayerNum()
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
+        if (PhotonNetwork.CurrentRoom != null)
         {
-            pv.RPC("EndGame", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
-            Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
-            restartBtn.SetActive(false);
-            // gm.LoadLobby();
-        }
+            if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
+            {
+                pv.RPC("EndGame", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
+                Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
+                restartBtn.SetActive(false);
+                // gm.LoadLobby();
+            } else if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && gameCompleted)
+            {
+                restartBtn.SetActive(false);
+            }
 
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-        {
-            restartBtn.SetActive(true);
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+            {
+                restartBtn.SetActive(true);
+            }
         }
+        
     }
 
 
@@ -278,7 +282,19 @@ public class Board : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ChangeTurn()
     {
-        turn = (turn == 1) ? 2 : 1;
+        if (turn == 1)
+        {
+            turn = 2;
+            playerSelected1.SetActive(false);
+            playerSelected2.SetActive(true);
+        }
+        else
+        {
+            turn = 1;
+            playerSelected1.SetActive(true);
+            playerSelected2.SetActive(false);
+        }
+        
         Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
         if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
             return;
