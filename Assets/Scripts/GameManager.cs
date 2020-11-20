@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
-
     // Update is called once per frame
     void Update()
     {
@@ -22,12 +21,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         PhotonNetwork.DestroyAll();
         PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
     }
-    
+
     public void LoadLobby()
     {
         StartCoroutine(DisconnectAndLoad());
     }
-    
+
     IEnumerator DisconnectAndLoad()
     {
         PhotonNetwork.Disconnect();
@@ -39,8 +38,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
         SceneManager.LoadScene(1);
     }
-    
-    
+
 
     public void RestartScene()
     {

@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: bc3e8e57676723b429fe800bb27fa244
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Glora
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: d61927e1909e5c74ab4d277565020378, type: 3}
+  - {fileID: 12800000, guid: d643a29397653f54cbea5412937fc9bf, type: 3}
+  - {fileID: 12800000, guid: fbb6180c875163c488375de582a6c10b, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

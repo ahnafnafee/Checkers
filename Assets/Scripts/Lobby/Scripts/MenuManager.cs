@@ -10,9 +10,9 @@ namespace Lobby.Scripts
     public class MenuManager : MonoBehaviour
     {
         public static MenuManager Instance;
-        [SerializeField] Button startGameButton = default;
 
         [SerializeField] Menu[] menus = default;
+        [SerializeField] Button startGameButton = default;
 
         void Awake()
         {
@@ -28,11 +28,11 @@ namespace Lobby.Scripts
         {
             for (int i = 0; i < menus.Length; i++)
             {
-                if(menus[i].menuName == menuName)
+                if (menus[i].menuName == menuName)
                 {
                     menus[i].Open();
                 }
-                else if(menus[i].open)
+                else if (menus[i].open)
                 {
                     CloseMenu(menus[i]);
                 }
@@ -41,13 +41,14 @@ namespace Lobby.Scripts
 
         public void OpenMenu(Menu menu)
         {
-            for(int i = 0; i < menus.Length; i++)
+            for (int i = 0; i < menus.Length; i++)
             {
-                if(menus[i].open)
+                if (menus[i].open)
                 {
                     CloseMenu(menus[i]);
                 }
             }
+
             menu.Open();
         }
 
@@ -64,7 +65,7 @@ namespace Lobby.Scripts
         private void Update()
         {
             // Checks if room has 2 players or not
-            if (PhotonNetwork.CurrentRoom!= null && PhotonNetwork.CurrentRoom.Players.Count == 2)
+            if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.Players.Count == 2)
             {
                 startGameButton.interactable = true;
             }

@@ -44,6 +44,11 @@ public class Piece : MonoBehaviour
         gameObject.transform.Find("selected").gameObject.SetActive(select);
     }
 
+    public void HighlightPiece(bool select)
+    {
+        gameObject.transform.Find("movable").gameObject.SetActive(select);
+    }
+
     public List<Move> GetMoves()
     {
         return moves;

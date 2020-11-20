@@ -10,28 +10,29 @@ namespace Lobby.Scripts
     public class Launcher : MonoBehaviourPunCallbacks
     {
         public static Launcher Instance;
-        
-        [SerializeField] TMP_InputField roomNameInputField = default;
         [SerializeField] TMP_Text errorText = default;
-        [SerializeField] TMP_Text roomNameText = default;
-        [SerializeField] Transform roomListContent = default;
-        [SerializeField] GameObject roomListItemPrefab = default;
         [SerializeField] Transform playerListContent = default;
         [SerializeField] GameObject playerListItemPrefab = default;
+        [SerializeField] Transform roomListContent = default;
+        [SerializeField] GameObject roomListItemPrefab = default;
+
+        [SerializeField] TMP_InputField roomNameInputField = default;
+        [SerializeField] TMP_Text roomNameText = default;
         [SerializeField] GameObject startGameButton = default;
-        
+
         void Awake()
         {
             // Ensures there is only 1 Launcher
-            if(Instance)
+            if (Instance)
             {
                 Destroy(gameObject);
                 return;
             }
+
             DontDestroyOnLoad(gameObject);
             Instance = this;
         }
-        
+
         void Start()
         {
             Debug.Log($"Network: {PhotonNetwork.IsConnected}");
@@ -41,7 +42,6 @@ namespace Lobby.Scripts
                 Debug.Log("Connected to Server");
                 PhotonNetwork.ConnectUsingSettings();
             }
-            
         }
 
         public override void OnConnectedToMaster()
@@ -60,104 +60,101 @@ namespace Lobby.Scripts
 
         public void CreateRoom()
         {
-            if(string.IsNullOrEmpty(roomNameInputField.text))
+            if (string.IsNullOrEmpty(roomNameInputField.text))
             {
                 return;
             }
-            
+
             // Room attributes
-            RoomOptions roomOps = new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = 2};
-            
+            RoomOptions roomOps = new RoomOptions() {IsVisible = true, IsOpen = true, MaxPlayers = 2};
+
             PhotonNetwork.CreateRoom(roomNameInputField.text, roomOps);
             MenuManager.Instance.OpenMenu("loading");
         }
-        
+
         public override void OnJoinedRoom()
         {
             MenuManager.Instance.OpenMenu("room");
             roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-            
+
             Player[] players = PhotonNetwork.PlayerList;
 
-            foreach(Transform child in playerListContent)
+            foreach (Transform child in playerListContent)
             {
                 Destroy(child.gameObject);
             }
 
-            for(int i = 0; i < players.Count(); i++)
+            for (int i = 0; i < players.Count(); i++)
             {
                 Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
             }
 
             startGameButton.SetActive(PhotonNetwork.IsMasterClient);
-            
         }
-        
+
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
             startGameButton.SetActive(PhotonNetwork.IsMasterClient);
         }
-        
+
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
             errorText.text = "Room Creation Failed: " + message;
             Debug.LogError("Room Creation Failed: " + message);
             MenuManager.Instance.OpenMenu("error");
         }
-        
+
         public void StartGame()
         {
             PhotonNetwork.LoadLevel(2);
         }
-        
+
         public void LeaveRoom()
         {
             PhotonNetwork.LeaveRoom();
             MenuManager.Instance.OpenMenu("loading");
         }
-        
+
         public override void OnLeftRoom()
         {
             MenuManager.Instance.OpenMenu("title");
         }
-        
+
         public void JoinRoom(RoomInfo info)
         {
             PhotonNetwork.JoinRoom(info.Name);
             MenuManager.Instance.OpenMenu("loading");
         }
 
-        
+
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
         {
-            foreach(Transform trans in roomListContent)
+            foreach (Transform trans in roomListContent)
             {
                 Destroy(trans.gameObject);
             }
-            
-            for(int i = 0; i < roomList.Count; i++)
+
+            for (int i = 0; i < roomList.Count; i++)
             {
-                if(roomList[i].RemovedFromList)
+                if (roomList[i].RemovedFromList)
                     continue;
-                
+
                 if (roomList[i].PlayerCount == 2)
                     continue;
-                
+
                 Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
             }
         }
-        
+
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             base.OnPlayerLeftRoom(otherPlayer);
             Debug.Log(otherPlayer.NickName + " has left the game");
         }
-        
+
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
         }
-
-
     }
 }

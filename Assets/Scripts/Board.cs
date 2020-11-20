@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using TMPro;
@@ -8,38 +7,45 @@ using UnityEngine.SceneManagement;
 public class Board : MonoBehaviourPunCallbacks
 {
     public static Board Instance;
-    
-    [Header("Instantiable Prefabs")]
+
+    [Header("Instantiable Prefabs")] 
     public GameObject blackPiecePrefab = default;
     public GameObject whitePiecePrefab = default;
-    public GameObject highlightPrefab = default;
-    public GameObject movePrefab = default;
-    public GameObject square = default;
-    
-    [Header("Board Attributes")]
-    private PhotonView pv = default;
-    private Vector2 mouseOver = default;
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
+    public GameObject highlightPrefab = default;
+    private List<Move> highlights = new List<Move>(); //List of all possible moves
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
+    public GameObject movePrefab = default;
     bool multiCapture = false;
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
-    private Piece tPiece = default;
     private Piece selected = default; //Selected piece (null if none selected)
     private Move sMove = default;
-    private List<Move> highlights = new List<Move>(); //List of all possible moves
-    
+    public GameObject square = default;
+    private Piece tPiece = default;
+    private int priority = default;
+
     [Header("Player Attributes")]
     //Change player color
     private string player1Color = "Dark";
     private string player2Color = "Light";
     private int turn = 1; //1 = player 1; 2 = player 2
+
+    [Header("Board Attributes")] 
+    private PhotonView pv = default;
+    private Vector2 mouseOver = default;
     
-    [Header("GUI")]
+    private bool gameCompleted = default;
+
+    [Header("GUI")] 
     public GameObject winGUI = default;
     public GameObject restartBtn = default;
+    public GameObject jmpInterface;
     public TextMeshProUGUI winText = default;
+
+    [Header("Game Manager")] 
+    private GameManager gm;
 
 
     void Awake()
@@ -52,7 +58,8 @@ public class Board : MonoBehaviourPunCallbacks
     {
         // Default conditions
         isClickable = true;
-        
+        gameCompleted = false;
+
         CreateBoard();
         if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
             transform.localRotation = Quaternion.Euler(0, 0, 180);
@@ -60,30 +67,31 @@ public class Board : MonoBehaviourPunCallbacks
         winGUI.SetActive(false);
     }
 
-    // [PunRPC]
     void Update()
     {
         // Enforces player to go back to lobby
         // if player count is less or equal to 11
         CheckPlayerNum();
-        
+
         UpdateMouseOver();
-        
+
         // For debugging wins
         DebugWin();
-        
+
         // For clicking pieces
         ClickPiece();
-
     }
+    
 
     private void CheckPlayerNum()
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
         {
+            Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
             restartBtn.SetActive(false);
+            // gm.LoadLobby();
         }
-        
+
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
         {
             restartBtn.SetActive(true);
@@ -96,21 +104,27 @@ public class Board : MonoBehaviourPunCallbacks
         PhotonNetwork.DestroyAll();
         pv.RPC("RpcRestart", RpcTarget.All);
     }
-    
+
     [PunRPC]
     private void RpcRestart()
     {
         winGUI.SetActive(false);
         PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
     }
-    
+
+
+    public void CloseJmpInterface()
+    {
+        jmpInterface.SetActive(false);
+    }
+
 
     private void ClickPiece()
     {
         if (isClickable)
         {
-            int x = (int)mouseOver.x;
-            int y = (int)mouseOver.y;
+            int x = (int) mouseOver.x;
+            int y = (int) mouseOver.y;
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -149,6 +163,7 @@ public class Board : MonoBehaviourPunCallbacks
                             sMove = selectedMove;
                             MovePiece();
                         }
+
                         if (!multiCapture)
                         {
                             ClearHighlights();
@@ -162,18 +177,18 @@ public class Board : MonoBehaviourPunCallbacks
                 }
             }
         }
-        
     }
 
     private Piece[,] GetActivePieces()
     {
         Piece[,] pieces = new Piece[8, 8];
         Piece p = null;
-        foreach(Transform child in transform.Find("Pieces"))
+        foreach (Transform child in transform.Find("Pieces"))
         {
             p = child.GetComponent<Piece>();
             pieces[p.GetX(), p.GetY()] = p;
         }
+
         return pieces;
     }
 
@@ -185,16 +200,17 @@ public class Board : MonoBehaviourPunCallbacks
         int x = move.GetX();
         int y = move.GetY();
         Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
-        
+
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
-        pView.RPC("Move", RpcTarget.All,  x, y);
+        pView.RPC("Move", RpcTarget.All, x, y);
 
         ClearHighlights();
 
         //Delete captured piece
         Piece capture = move.GetCapture();
-        if (capture != null) { 
+        if (capture != null)
+        {
             int cX = capture.GetX();
             int cY = capture.GetY();
 
@@ -205,7 +221,7 @@ public class Board : MonoBehaviourPunCallbacks
             ClearMoves();
 
             //find additional capture
-            findMultiCapture(x, y, x - cX, y - cY);
+            FindMultiCapture(x, y, x - cX, y - cY);
         }
 
         if (multiCapture)
@@ -213,7 +229,7 @@ public class Board : MonoBehaviourPunCallbacks
             selected.Select(true);
             DisplayMoves();
         }
-        else 
+        else
         {
             ClearMoves();
 
@@ -227,8 +243,6 @@ public class Board : MonoBehaviourPunCallbacks
         if ((p.GetPlayer() == 1 && y == 7) ||
             (p.GetPlayer() == 2 && y == 0))
             p.GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);
-
-        
     }
 
     public void ClearMoves()
@@ -260,6 +274,7 @@ public class Board : MonoBehaviourPunCallbacks
             if (highlights[i].GetX() == x && highlights[i].GetY() == y)
                 return highlights[i];
         }
+
         return null;
     }
 
@@ -273,10 +288,11 @@ public class Board : MonoBehaviourPunCallbacks
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 25.0f, LayerMask.GetMask("Board")))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 25.0f,
+            LayerMask.GetMask("Board")))
         {
-            mouseOver.x = (int)(hit.point.x - boardOffset.x);
-            mouseOver.y = (int)(hit.point.y - boardOffset.y);
+            mouseOver.x = (int) (hit.point.x - boardOffset.x);
+            mouseOver.y = (int) (hit.point.y - boardOffset.y);
         }
         else
         {
@@ -298,42 +314,12 @@ public class Board : MonoBehaviourPunCallbacks
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 1);
             }
+
             for (int y = 5; y < 8; y++)
             {
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 2);
             }
-            
-
-
-
-            //Multi capture front
-            /*CreatePiece(1, 1, 1);
-            CreatePiece(2, 2, 2);
-            CreatePiece(4, 4, 2);
-            CreatePiece(6, 6, 2);
-            CreatePiece(5, 7, 2);*/
-
-            //multi capture king
-            /*CreatePiece(6, 6, 1);
-            CreatePiece(1, 1, 2);
-            CreatePiece(3, 3, 2);
-            CreatePiece(5, 5, 2);
-            CreatePiece(1, 3, 2);
-            CreatePiece(1, 5, 2);
-            CreatePiece(3, 5, 2);
-            CreatePiece(7, 5, 2);
-            Piece[,] pieces = GetActivePieces();
-            pieces[6, 6].GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);*/
-
-            //promote mid multi capture
-            /*CreatePiece(1, 1, 1);
-            CreatePiece(3, 1, 1);
-            CreatePiece(2, 2, 2);
-            CreatePiece(4, 4, 2);
-            CreatePiece(6, 6, 2);
-            CreatePiece(2, 4, 2);
-            CreatePiece(4, 6, 2);*/
         }
         else
         {
@@ -349,10 +335,10 @@ public class Board : MonoBehaviourPunCallbacks
             p = CreatePiecePrefab(player1Color);
         else
             p = CreatePiecePrefab(player2Color);
-        
+
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
-        pView.RPC("Move", RpcTarget.All,  x, y);
+        pView.RPC("Move", RpcTarget.All, x, y);
 
         // p.Move(x,y);
 
@@ -371,7 +357,7 @@ public class Board : MonoBehaviourPunCallbacks
             return false;
 
         ClearHighlights();
-        
+
         Debug.Log("Selected " + x + " " + y);
 
         selected = p;
@@ -382,12 +368,15 @@ public class Board : MonoBehaviourPunCallbacks
             DisplayMoves();
             return true;
         }
-        else //deselect piece if piece has no possible moves
+
+        if (priority == 1 && selected.GetPriority() == 0)
         {
-            selected.Select(false);
-            selected = null;
-            return false;
+            jmpInterface.SetActive(true);
         }
+        
+        selected.Select(false);
+        selected = null;
+        return false;
     }
 
     private void CheckWin()
@@ -405,7 +394,8 @@ public class Board : MonoBehaviourPunCallbacks
             for (int j = 0; j < 8; j++)
             {
                 Piece p = pieces[i, j];
-                if (p != null) { 
+                if (p != null)
+                {
                     if (p.GetPlayer() == 1)
                     {
                         p1Count += 1;
@@ -416,13 +406,10 @@ public class Board : MonoBehaviourPunCallbacks
                         p2Count += 1;
                         p2MovesCount += p.GetMovesNum();
                     }
-                }   
+                }
             }
         }
-        /*DebugBoard();
-        Debug.Log(p1Count + " " + p2Count + " " + p1MovesCount + " " + p2MovesCount + " turn"+turn);
-        Debug.Log(p1MovesCount == 0);
-        Debug.Log(p1MovesCount == 0 && turn == 1);*/
+
         //if no pieces left or no available moves
         if (p2Count == 0 || (p2MovesCount == 0 && turn == 2)) //p1 win
             pv.RPC("EndGame", RpcTarget.All, 1);
@@ -437,10 +424,12 @@ public class Board : MonoBehaviourPunCallbacks
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             pv.RPC("EndGame", RpcTarget.All, 1);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2))
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             pv.RPC("EndGame", RpcTarget.All, 2);
         }
+
         ClearMoves();
     }
 
@@ -450,24 +439,26 @@ public class Board : MonoBehaviourPunCallbacks
     {
         winGUI.SetActive(true);
         isClickable = false;
+        gameCompleted = true;
+        
         winText.text = "Player " + player + " (" + ((player == 1) ? player1Color : player2Color) + ") wins";
-        Debug.Log("P"+ player + " won / " + ((player == 1) ? player1Color : player2Color));
+        Debug.Log("P" + player + " won / " + ((player == 1) ? player1Color : player2Color));
     }
 
-    private void findMultiCapture(int x, int y, int dx, int dy)
+    private void FindMultiCapture(int x, int y, int dx, int dy)
     {
         multiCapture = false;
         Piece[,] pieces = GetActivePieces();
 
         int adjSquareL = CheckSquare(x - 1, y + dy);
-        int jumpSquareL = CheckSquare(x - 2, y + 2 * dy);
+        int jumpSquareL = CheckSquare(x - 2, y + (2 * dy));
         int adjSquareR = CheckSquare(x + 1, y + dy);
-        int jumpSquareR = CheckSquare(x + 2, y + 2 * dy);
+        int jumpSquareR = CheckSquare(x + 2, y + (2 * dy));
 
         if (adjSquareL == 1 && jumpSquareL == 0)
         {
             Move mL = CreateMovePrefab("Move");
-            mL.MoveObj(x - 2, y + 2 * dy);
+            mL.MoveObj(x - 2, y + (2 * dy));
 
             mL.SetPriority(1);
             mL.SetCapture(pieces[x - 1, y + dy]);
@@ -479,8 +470,8 @@ public class Board : MonoBehaviourPunCallbacks
         if (adjSquareR == 1 && jumpSquareR == 0)
         {
             Move mR = CreateMovePrefab("Move");
-            mR.MoveObj(x + 2, y + 2 * dy);
-            
+            mR.MoveObj(x + 2, y + (2 * dy));
+
             mR.SetPriority(1);
             mR.SetCapture(pieces[x + 1, y + dy]);
 
@@ -491,14 +482,14 @@ public class Board : MonoBehaviourPunCallbacks
         if (selected.GetKing())
         {
             int adjSquareB = CheckSquare(x + dx, y - dy);
-            int jumpSquareB = CheckSquare(x + 2 * dx, y - 2 * dy);
+            int jumpSquareB = CheckSquare(x + (2 * dx), y - (2 * dy));
 
             if (adjSquareB == 1 && jumpSquareB == 0)
             {
                 Move mB = CreateMovePrefab("Move");
-                
-                mB.MoveObj(x + 2 * dx, y - 2 * dy);
-                
+
+                mB.MoveObj(x + 2 * dx, y - (2 * dy));
+
                 mB.SetPriority(1);
                 mB.SetCapture(pieces[x + dx, y - dy]);
                 selected.AddMove(mB);
@@ -518,8 +509,8 @@ public class Board : MonoBehaviourPunCallbacks
             int y = moves[i].GetY();
             Piece capture = moves[i].GetCapture();
 
-            h.MoveObj(x,y);
-            
+            h.MoveObj(x, y);
+
             h.SetCapture(capture);
             highlights.Add(h);
         }
@@ -541,7 +532,7 @@ public class Board : MonoBehaviourPunCallbacks
     //Find all possible moves for all pieces
     private void FindMoves()
     {
-        int priority = 0;
+        priority = 0;
         List<Piece> movablePieces = new List<Piece>();
         Piece[,] pieces = GetActivePieces();
         for (int i = 0; i < 8; i++)
@@ -585,27 +576,21 @@ public class Board : MonoBehaviourPunCallbacks
                     movablePieces.Clear();
                     priority = prio;
                 }
+
                 if (prio >= priority)
                     movablePieces.Add(p);
                 else
                     p.ClearMoves();
-
             }
-
         }
     }
 
-    /*private Piece CreateSquarePrefab(string c)
-    {
-        GameObject go = PhotonNetwork.Instantiate("Square", transform.position, Quaternion.identity);
-        go.transform.parent = transform.Find("Moves").transform;
-        return go.GetComponent<Piece>();
-    }*/
     private Move CreateMovePrefab(string c)
     {
         GameObject go;
         switch (c)
-        { //SHOULD BE LOCAL
+        {
+            //SHOULD BE LOCAL
             case "Highlight":
                 go = Instantiate(highlightPrefab, transform.position, Quaternion.identity);
                 go.transform.parent = transform.Find("Moves").transform;
@@ -622,7 +607,8 @@ public class Board : MonoBehaviourPunCallbacks
         GameObject go;
         PhotonView pView;
         switch (c)
-        { //SHOULD BE GLOBAL
+        {
+            //SHOULD BE GLOBAL
             case "Light":
                 go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
                 pView = go.GetComponent<PhotonView>();
@@ -642,32 +628,30 @@ public class Board : MonoBehaviourPunCallbacks
         Move m = CreateMovePrefab("Move");
 
         int adjSquare = CheckSquare(x + dx, y + dy);
-        int jumpSquare = CheckSquare(x + 2 * dx, y + 2 * dy);
+        int jumpSquare = CheckSquare(x + (2 * dx), y + (2 * dy));
 
 
         if (adjSquare == 0) //Move
         {
-            
             // NetSynced Move / Client ?
             // PhotonView pView = m.GetComponent<PhotonView>();
             // pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
-            
+
             m.MoveObj(x + dx, y + dy);
-            
-            
+
+
             m.SetPriority(0);
             p.AddMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0) //Capture
         {
-            
             // NetSynced Move / Client ?
             // PhotonView pView = m.GetComponent<PhotonView>();
             // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
-            
-            m.MoveObj(x + 2 * dx, y + 2 * dy);
-            
-            
+
+            m.MoveObj(x + (2 * dx), y + (2 * dy));
+
+
             m.SetPriority(1);
             m.SetCapture(pieces[x + dx, y + dy]);
             p.AddMove(m);
@@ -684,7 +668,6 @@ public class Board : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetCheckersArray()
     {
-        
     }
 
     //Check what is on square at (x,y)
@@ -714,8 +697,10 @@ public class Board : MonoBehaviourPunCallbacks
                 else
                     str += "O";
             }
+
             str += "\n";
         }
+
         Debug.Log(str);
     }
 

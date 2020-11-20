@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 namespace Lobby.Scripts
 {
-    
     public class RoomManager : MonoBehaviourPunCallbacks
     {
         public static RoomManager Instance;
@@ -14,11 +13,12 @@ namespace Lobby.Scripts
         void Awake()
         {
             // Ensures there is only 1 RoomManager
-            if(Instance)
+            if (Instance)
             {
                 Destroy(gameObject);
                 return;
             }
+
             DontDestroyOnLoad(gameObject);
             Instance = this;
         }
@@ -40,7 +40,8 @@ namespace Lobby.Scripts
             if (scene.buildIndex == 2)
             {
                 Debug.Log("Instantiated PlayerPrefab");
-                PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero, Quaternion.identity);
+                PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero,
+                    Quaternion.identity);
             }
         }
 
