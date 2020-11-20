@@ -10,42 +10,48 @@ public class Board : MonoBehaviourPunCallbacks
 
     [Header("Instantiable Prefabs")] 
     public GameObject blackPiecePrefab = default;
-    public GameObject whitePiecePrefab = default;
+
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
+
+    private bool gameCompleted = default;
+
+    [Header("Game Manager")] 
+    private GameManager gm;
+
     public GameObject highlightPrefab = default;
     private List<Move> highlights = new List<Move>(); //List of all possible moves
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
+
+    public GameObject jmpInterface;
+    private Vector2 mouseOver = default;
     public GameObject movePrefab = default;
     bool multiCapture = false;
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
-    private Piece selected = default; //Selected piece (null if none selected)
-    private Move sMove = default;
-    public GameObject square = default;
-    private Piece tPiece = default;
-    private int priority = default;
 
     [Header("Player Attributes")]
     //Change player color
     private string player1Color = "Dark";
+
     private string player2Color = "Light";
-    private int turn = 1; //1 = player 1; 2 = player 2
+    private int priority = default;
 
     [Header("Board Attributes")] 
     private PhotonView pv = default;
-    private Vector2 mouseOver = default;
-    
-    private bool gameCompleted = default;
+
+    public GameObject restartBtn = default;
+    private Piece selected = default; //Selected piece (null if none selected)
+    private Move sMove = default;
+    public GameObject square = default;
+    private Piece tPiece = default;
+    private int turn = 1; //1 = player 1; 2 = player 2
+    public GameObject whitePiecePrefab = default;
 
     [Header("GUI")] 
     public GameObject winGUI = default;
-    public GameObject restartBtn = default;
-    public GameObject jmpInterface;
-    public TextMeshProUGUI winText = default;
 
-    [Header("Game Manager")] 
-    private GameManager gm;
+    public TextMeshProUGUI winText = default;
 
 
     void Awake()
@@ -83,7 +89,7 @@ public class Board : MonoBehaviourPunCallbacks
         // For clicking pieces
         ClickPiece();
     }
-    
+
 
     private void CheckPlayerNum()
     {
