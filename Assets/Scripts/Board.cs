@@ -130,59 +130,66 @@ public class Board : MonoBehaviourPunCallbacks
 
     private void ClickPiece()
     {
-        if (isClickable)
+        if (!isClickable)
+            return;
+        
+        int x = (int) mouseOver.x;
+        int y = (int) mouseOver.y;
+
+        if (Input.GetMouseButtonDown(0))
         {
-            int x = (int) mouseOver.x;
-            int y = (int) mouseOver.y;
-
-            if (Input.GetMouseButtonDown(0))
+            DebugBoard();
+            if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+                return;
+            if (turn == 2)
             {
-                DebugBoard();
-                if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+                x = 7 - x;
+                y = 7 - y;
+            }
+            
+            if (multiCapture)
+            {
+                Move selectedMove = CheckValid(x, y);
+                if (selectedMove != null)
+                {
+                    sMove = selectedMove;
+                    MovePiece();
+
+                    if (!multiCapture)
+                        Invoke(nameof(CheckWin), 0.1f);
+                }
+                if (!multiCapture)
+                {
+                    ClearHighlights();
+                    DebugBoard();
+                }
+            }
+            else if (selected == null) //No pieces are selected
+            {
+                FindMoves();
+                SelectPiece(x, y);
+            }
+            else //A piece is already selected
+            {
+                selected.Select(false);
+                if (SelectPiece(x, y))//If not selecting another piece
                     return;
-                if (turn == 2)
+                
+                Move selectedMove = CheckValid(x, y);
+                if (selectedMove != null)
                 {
-                    x = 7 - x;
-                    y = 7 - y;
-                }
+                    sMove = selectedMove;
+                    MovePiece();
 
-                //Check whose turn it is
-                if (multiCapture)
-                {
-                    Move selectedMove = CheckValid(x, y);
-                    if (selectedMove != null)
-                    {
-                        sMove = selectedMove;
-                        MovePiece();
-                    }
+                    //Wait 0.1 sec second and check if valid 
+                    //might need more testing depending on ping
+                    if (!multiCapture)
+                        Invoke(nameof(CheckWin), 0.1f);
                 }
-                else if (selected == null) //No pieces are selected
+                if (!multiCapture)
                 {
-                    FindMoves();
-                    SelectPiece(x, y);
-                }
-                else //A piece is already selected
-                {
-                    selected.Select(false);
-                    if (!SelectPiece(x, y)) //If not selecting another piece
-                    {
-                        Move selectedMove = CheckValid(x, y);
-                        if (selectedMove != null)
-                        {
-                            sMove = selectedMove;
-                            MovePiece();
-                        }
-
-                        if (!multiCapture)
-                        {
-                            ClearHighlights();
-                            DebugBoard();
-
-                            //Wait 0.1 sec second and check if valid 
-                            //might need more testing depending on ping
-                            Invoke(nameof(CheckWin), 0.1f);
-                        }
-                    }
+                    ClearHighlights();
+                    DebugBoard();
                 }
             }
         }
@@ -273,6 +280,9 @@ public class Board : MonoBehaviourPunCallbacks
     {
         turn = (turn == 1) ? 2 : 1;
         Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
+        if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+            return;
+        FindMoves();
     }
 
     //Check if the selected move is in the list of valid moves for the selected piece
@@ -318,7 +328,7 @@ public class Board : MonoBehaviourPunCallbacks
         {
             Debug.Log("ONLY MASTER");
 
-            for (int y = 0; y < 3; y++)
+            /*for (int y = 0; y < 3; y++)
             {
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 1);
@@ -328,12 +338,41 @@ public class Board : MonoBehaviourPunCallbacks
             {
                 for (int x = 0; x < 8; x += 2)
                     CreatePiece(x + y % 2, y, 2);
-            }
+            }*/
+            //Multi capture front
+            CreatePiece(1, 1, 1);
+            CreatePiece(3, 1, 1);
+            CreatePiece(2, 2, 2);
+            CreatePiece(4, 4, 2);
+            CreatePiece(6, 6, 2);
+            CreatePiece(5, 7, 2);
+
+            //multi capture king
+            /*CreatePiece(6, 6, 1);
+            CreatePiece(1, 1, 2);
+            CreatePiece(3, 3, 2);
+            CreatePiece(5, 5, 2);
+            CreatePiece(1, 3, 2);
+            CreatePiece(1, 5, 2);
+            CreatePiece(3, 5, 2);
+            CreatePiece(7, 5, 2);
+            Piece[,] pieces = GetActivePieces();
+            pieces[6, 6].GetComponent<PhotonView>().RPC("Promote", RpcTarget.All);*/
+
+            //promote mid multi capture
+            /*CreatePiece(1, 1, 1);
+            CreatePiece(3, 1, 1);
+            CreatePiece(2, 2, 2);
+            CreatePiece(4, 4, 2);
+            CreatePiece(6, 6, 2);
+            CreatePiece(2, 4, 2);
+            CreatePiece(4, 6, 2);*/
         }
         else
         {
             restartBtn.SetActive(false);
         }
+        FindMoves();
     }
 
     //Create a piece at x,y
@@ -370,17 +409,12 @@ public class Board : MonoBehaviourPunCallbacks
         Debug.Log("Selected " + x + " " + y);
 
         selected = p;
-
+        Debug.Log(selected.GetMovesNum());
         if (selected.GetMovesNum() > 0) //highlight piece if move is possible
         {
             selected.Select(true);
             DisplayMoves();
             return true;
-        }
-
-        if (priority == 1 && selected.GetPriority() == 0)
-        {
-            jmpInterface.SetActive(true);
         }
         
         selected.Select(false);
@@ -438,8 +472,6 @@ public class Board : MonoBehaviourPunCallbacks
         {
             pv.RPC("EndGame", RpcTarget.All, 2);
         }
-
-        ClearMoves();
     }
 
     //After a person wins announce to both players 
@@ -505,6 +537,7 @@ public class Board : MonoBehaviourPunCallbacks
                 multiCapture = true;
             }
         }
+        HighlightMovable();
     }
 
     //Display all possible moves of selected piece
@@ -596,6 +629,29 @@ public class Board : MonoBehaviourPunCallbacks
                 }
             }
         }
+        if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+            return;
+        HighlightMovable();
+    }
+
+    private void HighlightMovable()
+    {
+        Piece[,] pieces = GetActivePieces();
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Piece p = pieces[i, j];
+                if (p == null)
+                    continue;
+                if (p.GetMovesNum() == 0)
+                {
+                    p.HighlightPiece(false);
+                    continue;
+                }
+                p.HighlightPiece(true);
+            }
+        }
     }
 
     private Move CreateMovePrefab(string c)
@@ -671,16 +727,8 @@ public class Board : MonoBehaviourPunCallbacks
         }
         else //No possible move
         {
-            // NetSynced Destroy
-
             Destroy(m.gameObject);
         }
-    }
-
-    // TODO: Sync checkers array across clients
-    [PunRPC]
-    private void SetCheckersArray()
-    {
     }
 
     //Check what is on square at (x,y)
