@@ -43,7 +43,6 @@ public class Board : MonoBehaviourPunCallbacks
     [Header("GUI")] 
     public GameObject winGUI = default;
     public GameObject restartBtn = default;
-    public GameObject jmpInterface = default;
     public GameObject playerSelected1 = default;
     public GameObject playerSelected2 = default;
     public TextMeshProUGUI winText = default;
@@ -104,7 +103,7 @@ public class Board : MonoBehaviourPunCallbacks
                 restartBtn.SetActive(false);
             }
 
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
             {
                 restartBtn.SetActive(true);
             }
@@ -124,12 +123,6 @@ public class Board : MonoBehaviourPunCallbacks
     {
         winGUI.SetActive(false);
         PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
-    }
-
-
-    public void CloseJmpInterface()
-    {
-        jmpInterface.SetActive(false);
     }
 
 
