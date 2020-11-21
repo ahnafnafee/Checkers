@@ -69,6 +69,10 @@ namespace Lobby.Scripts
             {
                 startGameButton.interactable = true;
             }
+            else
+            {
+                startGameButton.interactable = false;
+            }
         }
     }
 }

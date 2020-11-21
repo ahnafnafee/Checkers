@@ -18,7 +18,7 @@ namespace Lobby.Scripts
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
-            if(player == otherPlayer)
+            if(Equals(player, otherPlayer))
             {
                 Destroy(gameObject);
             }
