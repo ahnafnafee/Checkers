@@ -33,6 +33,9 @@ public class Board : MonoBehaviourPunCallbacks
     private string player1Color = "Dark";
     private string player2Color = "Light";
     private int priority = default;
+    private string p1ID = default;
+    private string p2ID = default;
+
 
     [Header("Board Attributes")] 
     private PhotonView pv = default;
@@ -63,12 +66,12 @@ public class Board : MonoBehaviourPunCallbacks
         playerSelected2.SetActive(false);
 
         CreateBoard();
-        if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
+        if (!IsPlayer1())
             transform.localRotation = Quaternion.Euler(0, 0, 180);
         //Set player1 and player2 color
         winGUI.SetActive(false);
         
-        Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
+        Debug.Log(PhotonNetwork.LocalPlayer);
     }
 
     void Update()
@@ -85,6 +88,14 @@ public class Board : MonoBehaviourPunCallbacks
         ClickPiece();
     }
 
+    //Returns true if player is the first player in the playerlist
+    private bool IsPlayer1()
+    {
+        //Debug.Log(PhotonNetwork.LocalPlayer);
+        if (PhotonNetwork.PlayerList.GetValue(0).Equals(PhotonNetwork.LocalPlayer))
+            return true;
+        return false;
+    }
 
     private void CheckPlayerNum()
     {
@@ -92,8 +103,8 @@ public class Board : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
             {
-                pv.RPC("EndGame", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
-                Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
+                pv.RPC("EndGame", RpcTarget.All, (IsPlayer1() ? 1 : 2));
+                Debug.Log(PhotonNetwork.LocalPlayer + " Player:" + (IsPlayer1() ? 1 : 2));
                 PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
             } 
@@ -137,7 +148,7 @@ public class Board : MonoBehaviourPunCallbacks
         if (Input.GetMouseButtonDown(0))
         {
             DebugBoard();
-            if (PhotonNetwork.LocalPlayer.ActorNumber != turn)
+            if ((IsPlayer1() ? 1 : 2) != turn)
                 return;
             if (turn == 2)
             {
@@ -632,7 +643,7 @@ public class Board : MonoBehaviourPunCallbacks
                     p.ClearMoves();
             }
         }
-        if (PhotonNetwork.LocalPlayer.ActorNumber == turn)
+        if ((IsPlayer1() ? 1 : 2) == turn)
             HighlightMovable(); 
     }
 
