@@ -10,10 +10,10 @@ namespace Lobby.Scripts
         [SerializeField] TMP_Text text = default;
         Player player;
 
-        public void SetUp(Player _player)
+        public void SetUp(Player p, int playerNum)
         {
-            player = _player;
-            text.text = _player.NickName;
+            player = p;
+            text.text = "Player " + playerNum;
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)

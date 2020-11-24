@@ -77,17 +77,7 @@ namespace Lobby.Scripts
             MenuManager.Instance.OpenMenu("room");
             roomNameText.text = PhotonNetwork.CurrentRoom.Name;
 
-            Player[] players = PhotonNetwork.PlayerList;
-
-            foreach (Transform child in playerListContent)
-            {
-                Destroy(child.gameObject);
-            }
-
-            for (int i = 0; i < players.Count(); i++)
-            {
-                Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-            }
+            RefreshPlayerList();
 
             startGameButton.SetActive(PhotonNetwork.IsMasterClient);
         }
@@ -133,6 +123,7 @@ namespace Lobby.Scripts
             {
                 Destroy(trans.gameObject);
             }
+            
 
             for (int i = 0; i < roomList.Count; i++)
             {
@@ -150,11 +141,30 @@ namespace Lobby.Scripts
         {
             base.OnPlayerLeftRoom(otherPlayer);
             Debug.Log(otherPlayer.NickName + " has left the game");
+
+            RefreshPlayerList();
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
-            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
+            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer, 1);
+
+            RefreshPlayerList();
+        }
+
+        private void RefreshPlayerList()
+        {
+            Player[] players = PhotonNetwork.PlayerList;
+            
+            foreach (Transform child in playerListContent)
+            {
+                Destroy(child.gameObject);
+            }
+
+            for (int i = 0; i < players.Count(); i++)
+            {
+                Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i], i + 1);
+            }
         }
     }
 }

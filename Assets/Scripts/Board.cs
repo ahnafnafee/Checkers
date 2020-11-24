@@ -101,10 +101,18 @@ public class Board : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.CurrentRoom != null)
         {
+            // For awarding win to player if the other player disconnects
             if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
             {
-                pv.RPC("EndGame", RpcTarget.All, (IsPlayer1() ? 1 : 2));
-                Debug.Log(PhotonNetwork.LocalPlayer + " Player:" + (IsPlayer1() ? 1 : 2));
+                if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
+                {
+                    pv.RPC("EndGame", RpcTarget.All, 1);
+                }
+                else
+                {
+                    pv.RPC("EndGame", RpcTarget.All, 2);
+                }
+                
                 PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
             } 
@@ -492,6 +500,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
     }
 
+    //TODO: Win UI not loading properly if someone force closes a game
     //After a person wins announce to both players 
     [PunRPC]
     private void EndGame(int player)
