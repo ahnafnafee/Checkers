@@ -49,7 +49,9 @@ public class Board : MonoBehaviourPunCallbacks
     public GameObject playerSelected1 = default;
     public GameObject playerSelected2 = default;
     public TextMeshProUGUI winText = default;
-
+    
+    private int P1Actor;
+    private int P2Actor;
 
     void Awake()
     {
@@ -104,15 +106,7 @@ public class Board : MonoBehaviourPunCallbacks
             // For awarding win to player if the other player disconnects
             if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
             {
-                if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
-                {
-                    pv.RPC("EndGame", RpcTarget.All, 1);
-                }
-                else
-                {
-                    pv.RPC("EndGame", RpcTarget.All, 2);
-                }
-                
+                pv.RPC("EndGame", RpcTarget.All, P1Actor == PhotonNetwork.LocalPlayer.ActorNumber ? 1 : 2);
                 PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
             } 
@@ -355,6 +349,7 @@ public class Board : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("ONLY MASTER");
+            P1Actor = PhotonNetwork.LocalPlayer.ActorNumber;
 
             for (int y = 0; y < 3; y++)
             {
@@ -398,6 +393,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
         else
         {
+            P2Actor = PhotonNetwork.LocalPlayer.ActorNumber;
             restartBtn.SetActive(false);
         }
         FindMoves();

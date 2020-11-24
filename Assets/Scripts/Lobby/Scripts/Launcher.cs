@@ -96,6 +96,7 @@ namespace Lobby.Scripts
 
         public void StartGame()
         {
+            MenuManager.Instance.OpenMenu("loading");
             PhotonNetwork.LoadLevel(2);
         }
 
@@ -151,6 +152,14 @@ namespace Lobby.Scripts
 
             RefreshPlayerList();
         }
+        
+        private bool IsPlayer1()
+        {
+            //Debug.Log(PhotonNetwork.LocalPlayer);
+            if (PhotonNetwork.PlayerList.GetValue(0).Equals(PhotonNetwork.LocalPlayer))
+                return true;
+            return false;
+        }
 
         private void RefreshPlayerList()
         {
@@ -163,7 +172,23 @@ namespace Lobby.Scripts
 
             for (int i = 0; i < players.Count(); i++)
             {
-                Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i], i + 1);
+                
+                PlayerListItem pItem = Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>();
+                pItem.SetUp(players[i], i + 1);
+                
+                if (i == 0)
+                {
+                    pItem.MakeLeader();
+                }
+                
+                if (IsPlayer1() && i == 0)
+                {
+                    pItem.IsMe();
+                } 
+                else if (!IsPlayer1() && i == 1)
+                {
+                    pItem.IsMe();
+                }
             }
         }
     }
