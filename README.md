@@ -1,7 +1,10 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bcbf08c9d6af40b195ffc3e36938b66d)](https://www.codacy.com/gh/ahnafnafee/Checkers/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ahnafnafee/Checkers&amp;utm_campaign=Badge_Grade)
+
 ![Title](/Miscellaneous/title.png?raw=true "Title")
 
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bcbf08c9d6af40b195ffc3e36938b66d)](https://www.codacy.com/gh/ahnafnafee/Checkers/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ahnafnafee/Checkers&amp;utm_campaign=Badge_Grade)
+
+
 
 ## Introduction
 
