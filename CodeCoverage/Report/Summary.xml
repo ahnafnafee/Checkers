@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageReport scope="Summary">
+  <Summary>
+    <Generatedon>11/29/2020 - 11:12:53 AM</Generatedon>
+    <Parser>OpenCoverParser</Parser>
+    <Assemblies>2</Assemblies>
+    <Classes>5</Classes>
+    <Files>5</Files>
+    <Coveredlines>354</Coveredlines>
+    <Uncoveredlines>415</Uncoveredlines>
+    <Coverablelines>769</Coverablelines>
+    <Totallines>1152</Totallines>
+    <Linecoverage>46</Linecoverage>
+    <Coveredbranches>0</Coveredbranches>
+    <Totalbranches>0</Totalbranches>
+  </Summary>
+  <Coverage>
+    <Assembly name="Tests" classes="2" coverage="100" coveredlines="252" coverablelines="252" totallines="384" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Tests.MoveTest" coverage="100" coveredlines="31" coverablelines="31" totallines="63" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.Pieces_Test" coverage="100" coveredlines="221" coverablelines="221" totallines="321" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+    <Assembly name="TestScriptAssembly" classes="3" coverage="19.7" coveredlines="102" coverablelines="517" totallines="768" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Board" coverage="0" coveredlines="0" coverablelines="409" totallines="593" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Move" coverage="100" coveredlines="32" coverablelines="32" totallines="56" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Piece" coverage="92.1" coveredlines="70" coverablelines="76" totallines="119" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>
