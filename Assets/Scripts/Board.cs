@@ -73,7 +73,7 @@ public class Board : MonoBehaviourPunCallbacks
         //Set player1 and player2 color
         winGUI.SetActive(false);
         
-        Debug.Log(PhotonNetwork.LocalPlayer);
+        //Debug.Log(PhotonNetwork.LocalPlayer);
     }
 
     void Update()
@@ -149,7 +149,7 @@ public class Board : MonoBehaviourPunCallbacks
 
         if (Input.GetMouseButtonDown(0))
         {
-            DebugBoard();
+            //DebugBoard();
             if ((IsPlayer1() ? 1 : 2) != turn)
                 return;
             if (turn == 2)
@@ -172,7 +172,7 @@ public class Board : MonoBehaviourPunCallbacks
                 if (!multiCapture)
                 {
                     ClearHighlights();
-                    DebugBoard();
+                    //DebugBoard();
                 }
             }
             else if (selected == null) //No pieces are selected
@@ -199,7 +199,7 @@ public class Board : MonoBehaviourPunCallbacks
                 if (!multiCapture)
                 {
                     ClearHighlights();
-                    DebugBoard();
+                    //DebugBoard();
                 }
             }
         }
@@ -225,7 +225,7 @@ public class Board : MonoBehaviourPunCallbacks
 
         int x = move.GetX();
         int y = move.GetY();
-        Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
+        //Debug.Log("Moved piece " + p.GetX() + " " + p.GetY() + " to " + x + " " + y);
 
         // NetSynced Move
         PhotonView pView = p.GetComponent<PhotonView>();
@@ -303,7 +303,7 @@ public class Board : MonoBehaviourPunCallbacks
             playerSelected2.SetActive(false);
         }
         
-        Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
+        //Debug.Log("Player " + turn + "'s turn / " + ((turn == 1) ? player1Color : player2Color));
         Invoke(nameof(FindMoves), 0.1f);
     }
 
@@ -324,7 +324,7 @@ public class Board : MonoBehaviourPunCallbacks
     {
         if (!Camera.main)
         {
-            Debug.Log("Unable to find main camera");
+            //Debug.Log("Unable to find main camera");
             return;
         }
 
@@ -348,7 +348,7 @@ public class Board : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("ONLY MASTER");
+            //Debug.Log("ONLY MASTER");
             P1Actor = PhotonNetwork.LocalPlayer.ActorNumber;
 
             for (int y = 0; y < 3; y++)
@@ -430,10 +430,10 @@ public class Board : MonoBehaviourPunCallbacks
 
         ClearHighlights();
 
-        Debug.Log("Selected " + x + " " + y);
+        //Debug.Log("Selected " + x + " " + y);
 
         selected = p;
-        Debug.Log(selected.GetMovesNum());
+        //Debug.Log(selected.GetMovesNum());
         if (selected.GetMovesNum() > 0) //highlight piece if move is possible
         {
             selected.Select(true);
@@ -495,8 +495,7 @@ public class Board : MonoBehaviourPunCallbacks
             pv.RPC("EndGame", RpcTarget.All, 2);
         }
     }
-
-    //TODO: Win UI not loading properly if someone force closes a game
+    
     //After a person wins announce to both players 
     [PunRPC]
     private void EndGame(int player)
@@ -506,7 +505,7 @@ public class Board : MonoBehaviourPunCallbacks
         gameCompleted = true;
         
         winText.text = "Player " + player + " (" + ((player == 1) ? player1Color : player2Color) + ") wins";
-        Debug.Log("P" + player + " won / " + ((player == 1) ? player1Color : player2Color));
+        //Debug.Log("P" + player + " won / " + ((player == 1) ? player1Color : player2Color));
     }
 
     private void FindMultiCapture(int x, int y, int dx, int dy)
@@ -718,24 +717,14 @@ public class Board : MonoBehaviourPunCallbacks
 
         if (adjSquare == 0) //Move
         {
-            // NetSynced Move / Client ?
-            // PhotonView pView = m.GetComponent<PhotonView>();
-            // pView.RPC("Move", RpcTarget.All,  x + dx, y + dy);
-
             m.MoveObj(x + dx, y + dy);
-
 
             m.SetPriority(0);
             p.AddMove(m);
         }
         else if (adjSquare == 1 && jumpSquare == 0) //Capture
         {
-            // NetSynced Move / Client ?
-            // PhotonView pView = m.GetComponent<PhotonView>();
-            // pView.RPC("Move", RpcTarget.All,  x + 2 * dx, y + 2 * dy);
-
             m.MoveObj(x + (2 * dx), y + (2 * dy));
-
 
             m.SetPriority(1);
             m.SetCapture(pieces[x + dx, y + dy]);

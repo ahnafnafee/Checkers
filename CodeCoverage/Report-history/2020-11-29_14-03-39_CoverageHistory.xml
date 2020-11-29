@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2020-11-29_14-03-39" tag="">
+  <assembly name="Tests">
+    <class name="Tests.BoardTest" coveredlines="8" coverablelines="8" totallines="30" coveredbranches="0" totalbranches="0" />
+    <class name="Tests.MoveTest" coveredlines="43" coverablelines="43" totallines="81" coveredbranches="0" totalbranches="0" />
+    <class name="Tests.PiecesTest" coveredlines="231" coverablelines="231" totallines="337" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="TestScriptAssembly">
+    <class name="Board" coveredlines="88" coverablelines="412" totallines="596" coveredbranches="0" totalbranches="0" />
+    <class name="Move" coveredlines="32" coverablelines="32" totallines="56" coveredbranches="0" totalbranches="0" />
+    <class name="Piece" coveredlines="76" coverablelines="76" totallines="119" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

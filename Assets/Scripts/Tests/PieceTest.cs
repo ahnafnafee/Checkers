@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Tests.TestingScripts;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Tests
 {
-    public class Pieces_Test
+    public class PiecesTest
     {
         private GameObject pieceObject = new GameObject();
         private Piece p;
@@ -88,6 +89,22 @@ namespace Tests
         }
         
         [Test]
+        public void PieceSetPlayerOne()
+        {
+            p = pieceObject.AddComponent<Piece>();
+            p.SetPlayer(1);
+            Assert.AreEqual(1,p.GetPlayer());
+        }
+        
+        [Test]
+        public void PieceSetPlayerTwo()
+        {
+            p = pieceObject.AddComponent<Piece>();
+            p.SetPlayer(2);
+            Assert.AreEqual(2,p.GetPlayer());
+        }
+        
+        [Test]
         public void PieceDestroy()
         {
             var tempObject = new GameObject();
@@ -95,7 +112,7 @@ namespace Tests
             tempObject.name = "tempPiece";
             Assert.IsNotNull(tempObject);
             tempPiece.DestroyPiece();
-            Assert.IsTrue(tempObject == null);
+            Assert.IsTrue(tempObject == null); 
         }
         
         [Test]

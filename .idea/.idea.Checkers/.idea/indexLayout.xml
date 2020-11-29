@@ -29,9 +29,7 @@
     <explicitExcludes>
       <Path>.git</Path>
       <Path>.idea</Path>
-      <Path>.vs</Path>
       <Path>AndroidBuild</Path>
-      <Path>Build</Path>
       <Path>Builds</Path>
       <Path>CodeCoverage</Path>
       <Path>Library</Path>

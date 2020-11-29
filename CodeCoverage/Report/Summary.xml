@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CoverageReport scope="Summary">
   <Summary>
-    <Generatedon>11/29/2020 - 11:12:53 AM</Generatedon>
+    <Generatedon>11/29/2020 - 5:06:24 PM</Generatedon>
     <Parser>OpenCoverParser</Parser>
     <Assemblies>2</Assemblies>
-    <Classes>5</Classes>
-    <Files>5</Files>
-    <Coveredlines>354</Coveredlines>
-    <Uncoveredlines>415</Uncoveredlines>
-    <Coverablelines>769</Coverablelines>
-    <Totallines>1152</Totallines>
-    <Linecoverage>46</Linecoverage>
+    <Classes>6</Classes>
+    <Files>6</Files>
+    <Coveredlines>846</Coveredlines>
+    <Uncoveredlines>85</Uncoveredlines>
+    <Coverablelines>931</Coverablelines>
+    <Totallines>1435</Totallines>
+    <Linecoverage>90.8</Linecoverage>
     <Coveredbranches>0</Coveredbranches>
     <Totalbranches>0</Totalbranches>
   </Summary>
   <Coverage>
-    <Assembly name="Tests" classes="2" coverage="100" coveredlines="252" coverablelines="252" totallines="384" branchcoverage="" coveredbranches="0" totalbranches="0">
-      <Class name="Tests.MoveTest" coverage="100" coveredlines="31" coverablelines="31" totallines="63" branchcoverage="" coveredbranches="0" totalbranches="0" />
-      <Class name="Tests.Pieces_Test" coverage="100" coveredlines="221" coverablelines="221" totallines="321" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    <Assembly name="Tests" classes="3" coverage="100" coveredlines="376" coverablelines="376" totallines="606" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Tests.BoardTest" coverage="100" coveredlines="102" coverablelines="102" totallines="186" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.MoveTest" coverage="100" coveredlines="43" coverablelines="43" totallines="82" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.PiecesTest" coverage="100" coveredlines="231" coverablelines="231" totallines="338" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>
-    <Assembly name="TestScriptAssembly" classes="3" coverage="19.7" coveredlines="102" coverablelines="517" totallines="768" branchcoverage="" coveredbranches="0" totalbranches="0">
-      <Class name="Board" coverage="0" coveredlines="0" coverablelines="409" totallines="593" branchcoverage="" coveredbranches="0" totalbranches="0" />
-      <Class name="Move" coverage="100" coveredlines="32" coverablelines="32" totallines="56" branchcoverage="" coveredbranches="0" totalbranches="0" />
-      <Class name="Piece" coverage="92.1" coveredlines="70" coverablelines="76" totallines="119" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    <Assembly name="TestScriptAssembly" classes="3" coverage="84.6" coveredlines="470" coverablelines="555" totallines="829" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Tests.TestingScripts.Board" coverage="80.9" coveredlines="362" coverablelines="447" totallines="651" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.TestingScripts.Move" coverage="100" coveredlines="32" coverablelines="32" totallines="57" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.TestingScripts.Piece" coverage="100" coveredlines="76" coverablelines="76" totallines="121" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>
   </Coverage>
 </CoverageReport>

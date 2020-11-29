@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 83646103e6f3395408e1db1754defbd5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - blackPiecePrefab: {fileID: 8659051625264144255, guid: 301253d5055b5734e8126748b9b11cc5, type: 3}
+  - whitePiecePrefab: {fileID: 4970993380596824222, guid: 2a7c15eb38d13754f961f7bf025e37f7, type: 3}
+  - highlightPrefab: {fileID: 2799701355552364789, guid: 54a263eed2f9444478f4bb3b9a7b7794, type: 3}
+  - MovePrefab: {fileID: 2799701355552364789, guid: 7ffa5fd27f5555d4d99dc77c3d0bdd4e, type: 3}
+  - square: {fileID: 2799701355552364789, guid: 8d4aa0a119cd4e74cb04e7c39607e74c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
