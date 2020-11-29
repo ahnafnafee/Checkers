@@ -56,16 +56,18 @@ namespace Tests
         {
             b = boardObject.AddComponent<Board>();
             b.Start();
-                        
+                    
+            //Simulate moving mouse to coordinate
             b.UpdateMouseOver(2, 2);
+            //Simulate left mouse click
             b.Click();
+            //Run update 
             b.Update();
 
             var pieces = b.GetActivePieces();
             Assert.IsTrue(pieces[2,2].transform.Find("selected").gameObject.activeInHierarchy);
         }
         
-                
         [Test]
         public void BoardSelectInvalidNoMoves()
         {
