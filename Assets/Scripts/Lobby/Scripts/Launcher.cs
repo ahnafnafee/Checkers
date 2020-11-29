@@ -33,7 +33,7 @@ namespace Lobby.Scripts
             Instance = this;
         }
 
-        void Start()
+        public void Start()
         {
             Debug.Log($"Network: {PhotonNetwork.IsConnected}");
             Debug.Log($"Room: {PhotonNetwork.InRoom}");
@@ -41,12 +41,17 @@ namespace Lobby.Scripts
             {
                 Debug.Log("Connected to Server");
                 PhotonNetwork.ConnectUsingSettings();
+                Debug.Log($"Network: {PhotonNetwork.IsConnected}");
+                Debug.Log($"Room: {PhotonNetwork.InRoom}");
             }
         }
 
         public override void OnConnectedToMaster()
         {
             Debug.Log("Connected to Master");
+
+            Debug.Log($"Net Connection: {PhotonNetwork.IsConnected}");
+
             PhotonNetwork.JoinLobby();
             PhotonNetwork.AutomaticallySyncScene = true;
         }
