@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 
 namespace Tests
 {
-    public class PiecesTest
+    public class PieceTest
     {
         private GameObject pieceObject = new GameObject();
         private Piece p;
