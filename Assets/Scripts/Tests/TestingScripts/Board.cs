@@ -73,7 +73,7 @@ namespace Tests.TestingScripts
             if (click)
             {
                 click = false;
-                DebugBoard();
+                //DebugBoard();
                 
             
                 if (multiCapture)
@@ -88,7 +88,7 @@ namespace Tests.TestingScripts
                     if (!multiCapture)
                     {
                         ClearHighlights();
-                        DebugBoard();
+                        //DebugBoard();
                     }
                 }
                 else if (selected == null) //No pieces are selected
@@ -112,7 +112,7 @@ namespace Tests.TestingScripts
                     if (!multiCapture)
                     {
                         ClearHighlights();
-                        DebugBoard();
+                        //DebugBoard();
                     }
                 }
             }
@@ -239,7 +239,7 @@ namespace Tests.TestingScripts
         }
 
         //Create all Pieces
-        public void CreateBoard()
+        private void CreateBoard()
         {
             for (int y = 0; y < 3; y++)
             {
@@ -258,7 +258,8 @@ namespace Tests.TestingScripts
         
         public void SetBoard(string posStr)
         {
-            ClearPieces();
+            isClickable = true;
+            gameCompleted = false;
             
             var posArr = posStr.Split('-');
 
@@ -269,15 +270,6 @@ namespace Tests.TestingScripts
             }
             
             FindMoves();
-        }
-
-        private void ClearPieces()
-        {
-            foreach (Transform child in transform)
-            {
-                if (child.name.Equals("Piece"))
-                    DestroyImmediate(child.gameObject);
-            }
         }
 
         private void CreatePiece(int x, int y, int player)
@@ -622,7 +614,7 @@ namespace Tests.TestingScripts
         }
 
         //Display the current board layout in console
-        private void DebugBoard()
+        /*private void DebugBoard()
         {
             string str = "";
             Piece[,] Pieces = GetActivePieces();
@@ -640,7 +632,7 @@ namespace Tests.TestingScripts
             }
 
             Debug.Log(str);
-        }
+        }*/
 
 
         public string GetWinner()
