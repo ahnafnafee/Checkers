@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Lobby.Scripts;
 using Photon.Pun;
 using Photon.Realtime;
@@ -7,6 +8,11 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+    }
+
     void Update()
     {
         if ((Input.anyKey) && SceneManager.GetActiveScene().buildIndex == 0)
