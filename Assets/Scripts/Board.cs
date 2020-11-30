@@ -621,38 +621,31 @@ public class Board : MonoBehaviourPunCallbacks
     private Move CreateMovePrefab(string c)
     {
         GameObject go;
-        switch (c)
-        {
-            //SHOULD BE LOCAL
-            case "Highlight":
-                go = Instantiate(highlightPrefab, transform.position, Quaternion.identity);
-                go.transform.parent = transform.Find("Moves").transform;
-                return go.GetComponent<Move>();
-            default:
-                go = Instantiate(movePrefab, transform.position, Quaternion.identity);
-                go.transform.parent = transform.Find("Moves").transform;
-                return go.GetComponent<Move>();
+        if (c.Equals("Highlight")) {
+            go = Instantiate(highlightPrefab, transform.position, Quaternion.identity);
+            go.transform.parent = transform.Find("Moves").transform;
+            return go.GetComponent<Move>();
         }
+        go = Instantiate(movePrefab, transform.position, Quaternion.identity);
+        go.transform.parent = transform.Find("Moves").transform;
+        return go.GetComponent<Move>();
     }
 
     private Piece CreatePiecePrefab(string c)
     {
         GameObject go;
         PhotonView pView;
-        switch (c)
+        if (c.Equals("Light"))
         {
-            //SHOULD BE GLOBAL
-            case "Light":
-                go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
-                pView = go.GetComponent<PhotonView>();
-                pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
-                return go.GetComponent<Piece>();
-            default:
-                go = PhotonNetwork.Instantiate("DarkPiece", transform.position, Quaternion.identity);
-                pView = go.GetComponent<PhotonView>();
-                pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
-                return go.GetComponent<Piece>();
+            go = PhotonNetwork.Instantiate("LightPiece", transform.position, Quaternion.identity);
+            pView = go.GetComponent<PhotonView>();
+            pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
+            return go.GetComponent<Piece>();
         }
+        go = PhotonNetwork.Instantiate("DarkPiece", transform.position, Quaternion.identity);
+        pView = go.GetComponent<PhotonView>();
+        pView.RPC("SetParent", RpcTarget.All, pv.ViewID);
+        return go.GetComponent<Piece>();
     }
 
     private void CheckDirection(Piece p, int x, int y, int dx, int dy)
