@@ -30,14 +30,14 @@
       <Path>.git</Path>
       <Path>.idea</Path>
       <Path>AndroidBuild</Path>
+      <Path>AndroidBuilds</Path>
       <Path>Builds</Path>
       <Path>CodeCoverage</Path>
-      <Path>Instructions</Path>
       <Path>Library</Path>
       <Path>Logs</Path>
       <Path>Miscellaneous</Path>
-      <Path>Temp</Path>
       <Path>UserSettings</Path>
+      <Path>instructions</Path>
       <Path>obj</Path>
     </explicitExcludes>
   </component>
