@@ -701,13 +701,12 @@ public class Board : MonoBehaviourPunCallbacks
     }
 
     //Display the current board layout in console
-    private void DebugBoard()
+    /*private void DebugBoard()
     {
-        string str = "";
-        Piece[,] pieces = GetActivePieces();
-        for (int j = 7; j >= 0; j--)
+        var pieces = GetActivePieces();
+        for (var j = 7; j >= 0; j--)
         {
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 if (pieces[i, j] != null)
                     str += "P";
@@ -717,5 +716,5 @@ public class Board : MonoBehaviourPunCallbacks
             str += "\n";
         }
         Debug.Log(str);
-    }
+    }*/
 }
