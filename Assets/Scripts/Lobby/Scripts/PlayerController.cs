@@ -5,12 +5,12 @@ namespace Lobby.Scripts
 {
 	public class PlayerController : MonoBehaviourPunCallbacks
 	{
-		PhotonView PV;
+		PhotonView pv;
 		private PhotonView pvBoard;
 
 		void Awake()
 		{
-			PV = GetComponent<PhotonView>();
+			pv = GetComponent<PhotonView>();
 		}
 	}
 }

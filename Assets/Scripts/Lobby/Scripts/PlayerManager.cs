@@ -6,16 +6,16 @@ namespace Lobby.Scripts
 {
     public class PlayerManager : MonoBehaviour
     {
-        PhotonView PV;
+        PhotonView pv;
 
         void Awake()
         {
-            PV = GetComponent<PhotonView>();
+            pv = GetComponent<PhotonView>();
         }
 
         void Start()
         {
-            if(PV.IsMine)
+            if(pv.IsMine)
             {
                 CreateController();
             }

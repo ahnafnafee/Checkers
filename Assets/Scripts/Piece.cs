@@ -6,15 +6,15 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
+    private readonly Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
     private bool king = false;
     private List<Move> moves = new List<Move>();
-    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
+    private readonly Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
     private int player;
     private int priority = 0;
 
-    protected int X = 0;
-    protected int Y = 0;
+    private int x = 0;
+    private int y = 0;
 
     public int GetPlayer()
     {
@@ -56,10 +56,10 @@ public class Piece : MonoBehaviour
 
     public void AddMove(Move move)
     {
-        int prio = move.GetPriority();
+        var prio = move.GetPriority();
         if (prio > priority) //Force capture
         {
-            foreach (Move m in moves)
+            foreach (var m in moves)
             {
                 Destroy(m.gameObject);
             }
@@ -75,7 +75,7 @@ public class Piece : MonoBehaviour
 
     public void ClearMoves()
     {
-        foreach (Move m in moves)
+        foreach (var m in moves)
         {
             Destroy(m.gameObject);
         }
@@ -95,26 +95,26 @@ public class Piece : MonoBehaviour
 
     public int GetX()
     {
-        return X;
+        return x;
     }
 
     [PunRPC]
-    public void Move(int x, int y)
+    public void Move(int xVal, int yVal)
     {
-        X = x;
-        Y = y;
-        transform.localPosition = (new Vector2(x, y) + boardOffset + pieceOffset)/10;
+        x = xVal;
+        y = yVal;
+        transform.localPosition = (new Vector2(xVal, yVal) + boardOffset + pieceOffset)/10;
     }
 
     public void SetVal(int xVal, int yVal)
     {
-        X = xVal;
-        Y = yVal;
+        x = xVal;
+        y = yVal;
     }
 
     public int GetY()
     {
-        return Y;
+        return y;
     }
     
     [PunRPC]
