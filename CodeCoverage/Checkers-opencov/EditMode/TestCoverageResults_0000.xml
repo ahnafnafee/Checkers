@@ -7,9 +7,9 @@
       <ModuleTime>0001-01-01T00:00:00</ModuleTime>
       <ModuleName>TestScriptAssembly</ModuleName>
       <Files>
-        <File uid="1" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/TestingScripts/Board.cs" />
-        <File uid="2" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/TestingScripts/Move.cs" />
-        <File uid="3" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/TestingScripts/Piece.cs" />
+        <File uid="1" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/TestingScripts/Board.cs" />
+        <File uid="2" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/TestingScripts/Move.cs" />
+        <File uid="3" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/TestingScripts/Piece.cs" />
       </Files>
       <Classes>
         <Class>
@@ -1090,9 +1090,9 @@
       <ModuleTime>0001-01-01T00:00:00</ModuleTime>
       <ModuleName>Tests</ModuleName>
       <Files>
-        <File uid="4" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/BoardTest.cs" />
-        <File uid="5" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/MoveTest.cs" />
-        <File uid="6" fullPath="D:/SE181 Checkers Game/Checkers/Assets/Scripts/Tests/PieceTest.cs" />
+        <File uid="4" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/BoardTest.cs" />
+        <File uid="5" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/MoveTest.cs" />
+        <File uid="6" fullPath="C:/Users/nafee/GitHub/Checkers/Assets/Scripts/Tests/PieceTest.cs" />
       </Files>
       <Classes>
         <Class>
