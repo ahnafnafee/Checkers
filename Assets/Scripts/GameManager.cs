@@ -7,14 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
-    [SerializeField] GameObject helpMenu;
-    [SerializeField] GameObject helpIcon;
-
-    private void Start()
-    {
-        helpMenu.SetActive(false);
-        helpIcon.SetActive(true);
-    }
     void Update()
     {
         if ((Input.anyKey) && SceneManager.GetActiveScene().buildIndex == 0)
@@ -44,18 +36,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         }
 
         SceneManager.LoadScene(1);
-    }
-
-    public void OpenHelp()
-    {
-        helpMenu.SetActive(true);
-        helpIcon.SetActive(false);
-    }
-
-    public void CloseHelp()
-    {
-        helpMenu.SetActive(false);
-        helpIcon.SetActive(true);
     }
 
     public void RestartScene()

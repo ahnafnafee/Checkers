@@ -8611,8 +8611,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1799031273}
-        m_TargetAssemblyTypeName: Lobby.Scripts.MenuManager, Assembly-CSharp
+      - m_Target: {fileID: 1799031274}
+        m_TargetAssemblyTypeName: HelpScript, Assembly-CSharp
         m_MethodName: OpenHelp
         m_Mode: 1
         m_Arguments:
@@ -13256,6 +13256,7 @@ GameObject:
   - component: {fileID: 1799031269}
   - component: {fileID: 1799031272}
   - component: {fileID: 1799031273}
+  - component: {fileID: 1799031274}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -13394,6 +13395,18 @@ MonoBehaviour:
   - {fileID: 1576176321}
   - {fileID: 54144328}
   startGameButton: {fileID: 1912337145}
+--- !u!114 &1799031274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799031267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49400d0c73113434fad1228917b4ce87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   helpMenu: {fileID: 186986626}
   helpIcon: {fileID: 1212077476}
 --- !u!1 &1815968878
@@ -13991,8 +14004,8 @@ MonoBehaviour:
   buttonEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1799031273}
-        m_TargetAssemblyTypeName: Lobby.Scripts.MenuManager, Assembly-CSharp
+      - m_Target: {fileID: 1799031274}
+        m_TargetAssemblyTypeName: HelpScript, Assembly-CSharp
         m_MethodName: CloseHelp
         m_Mode: 1
         m_Arguments:

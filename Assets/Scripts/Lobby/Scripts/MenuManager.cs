@@ -13,8 +13,6 @@ namespace Lobby.Scripts
 
         [SerializeField] Menu[] menus;
         [SerializeField] Button startGameButton;
-        [SerializeField] GameObject helpMenu;
-        [SerializeField] GameObject helpIcon;
 
         void Awake()
         {
@@ -23,8 +21,6 @@ namespace Lobby.Scripts
 
         private void Start()
         {
-            helpMenu.SetActive(false);
-            helpIcon.SetActive(true);
             startGameButton.interactable = false;
         }
 
@@ -64,18 +60,6 @@ namespace Lobby.Scripts
         public void QuitGame()
         {
             Application.Quit();
-        }
-
-        public void OpenHelp()
-        {
-            helpMenu.SetActive(true);
-            helpIcon.SetActive(false);
-        }
-
-        public void CloseHelp()
-        {
-            helpMenu.SetActive(false);
-            helpIcon.SetActive(true);
         }
 
         private void Update()
