@@ -1,23 +1,22 @@
-﻿using Photon.Pun;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Square : MonoBehaviourPun
+public class Square : MonoBehaviour
 {
-    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-    private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
+    protected int Priority = 0;
 
     protected int X = 0;
     protected int Y = 0;
-
-    public int GetX()
+    
+    public int GetPriority()
     {
-        return X;
+        return Priority;
     }
-    public void Move(int x, int y)
+
+    public void SetPriority(int priorityVal)
     {
-        X = x;
-        Y = y;
-        transform.position = new Vector2(x, y) + boardOffset + pieceOffset;
+        Priority = priorityVal;
     }
     
     public void SetVal(int xVal, int yVal)
@@ -25,18 +24,15 @@ public class Square : MonoBehaviourPun
         X = xVal;
         Y = yVal;
     }
+
+    public int GetX()
+    {
+        return X;
+    }
+
     public int GetY()
     {
         return Y;
     }
-
-    private void Awake()
-    {
-        PhotonNetwork.AddCallbackTarget(this);
-    }
     
-    private void OnDestroy()
-    {
-        PhotonNetwork.RemoveCallbackTarget(this);
-    }
 }

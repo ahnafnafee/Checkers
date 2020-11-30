@@ -21,7 +21,6 @@ public class Board : MonoBehaviourPunCallbacks
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
-    public GameObject square = default;
     private Piece tPiece = default;
     private Piece selected; //Selected piece (null if none selected)
     private Move sMove;
@@ -36,17 +35,17 @@ public class Board : MonoBehaviourPunCallbacks
 
 
     [Header("Board Attributes")] 
-    private PhotonView pv = default;
+    private PhotonView pv;
     private int turn = 1; //1 = player 1; 2 = player 2
     private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-    private bool gameCompleted = default;
+    private bool gameCompleted;
 
     [Header("GUI")] 
-    public GameObject winGUI = default;
-    public GameObject restartBtn = default;
-    public GameObject playerSelected1 = default;
-    public GameObject playerSelected2 = default;
-    public TextMeshProUGUI winText = default;
+    public GameObject winGUI;
+    public GameObject restartBtn;
+    public GameObject playerSelected1;
+    public GameObject playerSelected2;
+    public TextMeshProUGUI winText;
     
     private int P1Actor;
 

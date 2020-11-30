@@ -4,17 +4,13 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-public class Piece : MonoBehaviour
+public class Piece : Square
 {
     private readonly Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
     private bool king = false;
     private List<Move> moves = new List<Move>();
     private readonly Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
     private int player;
-    private int priority = 0;
-
-    private int x = 0;
-    private int y = 0;
 
     public int GetPlayer()
     {
@@ -57,17 +53,17 @@ public class Piece : MonoBehaviour
     public void AddMove(Move move)
     {
         var prio = move.GetPriority();
-        if (prio > priority) //Force capture
+        if (prio > Priority) //Force capture
         {
             foreach (var m in moves)
             {
                 Destroy(m.gameObject);
             }
             moves.Clear();
-            priority = prio;
+            Priority = prio;
         }
 
-        if (prio >= priority)
+        if (prio >= Priority)
             moves.Add(move);
         else
             Destroy(move.gameObject);
@@ -80,7 +76,7 @@ public class Piece : MonoBehaviour
             Destroy(m.gameObject);
         }
         moves.Clear();
-        priority = 0;
+        Priority = 0;
     }
 
     public int GetMovesNum()
@@ -88,35 +84,14 @@ public class Piece : MonoBehaviour
         return moves.Count;
     }
 
-    public int GetPriority()
-    {
-        return priority;
-    }
-
-    public int GetX()
-    {
-        return x;
-    }
-
     [PunRPC]
     public void Move(int xVal, int yVal)
     {
-        x = xVal;
-        y = yVal;
+        X = xVal;
+        Y = yVal;
         transform.localPosition = (new Vector2(xVal, yVal) + boardOffset + pieceOffset)/10;
     }
 
-    public void SetVal(int xVal, int yVal)
-    {
-        x = xVal;
-        y = yVal;
-    }
-
-    public int GetY()
-    {
-        return y;
-    }
-    
     [PunRPC]
     public void DestroyPiece()
     {
