@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CoverageReport scope="Summary">
   <Summary>
-    <Generatedon>11/29/2020 - 6:14:06 PM</Generatedon>
+    <Generatedon>11/29/2020 - 7:52:45 PM</Generatedon>
     <Parser>OpenCoverParser</Parser>
     <Assemblies>2</Assemblies>
-    <Classes>6</Classes>
-    <Files>6</Files>
-    <Coveredlines>1163</Coveredlines>
-    <Uncoveredlines>0</Uncoveredlines>
-    <Coverablelines>1163</Coverablelines>
-    <Totallines>1795</Totallines>
-    <Linecoverage>100</Linecoverage>
+    <Classes>7</Classes>
+    <Files>7</Files>
+    <Coveredlines>1172</Coveredlines>
+    <Uncoveredlines>2</Uncoveredlines>
+    <Coverablelines>1174</Coverablelines>
+    <Totallines>1832</Totallines>
+    <Linecoverage>99.8</Linecoverage>
     <Coveredbranches>0</Coveredbranches>
     <Totalbranches>0</Totalbranches>
   </Summary>
   <Coverage>
-    <Assembly name="Tests" classes="3" coverage="100" coveredlines="632" coverablelines="632" totallines="974" branchcoverage="" coveredbranches="0" totalbranches="0">
+    <Assembly name="Tests" classes="4" coverage="99.6" coveredlines="641" coverablelines="643" totallines="1011" branchcoverage="" coveredbranches="0" totalbranches="0">
       <Class name="Tests.BoardTest" coverage="100" coveredlines="358" coverablelines="358" totallines="554" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.LobbyTest" coverage="81.8" coveredlines="9" coverablelines="11" totallines="37" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="Tests.MoveTest" coverage="100" coveredlines="43" coverablelines="43" totallines="82" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="Tests.PieceTest" coverage="100" coveredlines="231" coverablelines="231" totallines="338" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>

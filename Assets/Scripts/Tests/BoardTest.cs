@@ -105,7 +105,7 @@ namespace Tests
         }
         
         [Test]
-        public void BoardSelectInvalidEnemy()
+        public void BoardSelectInvalidOpponent()
         {
             b = boardObject.AddComponent<Board>();
             b.Start();
