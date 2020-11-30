@@ -64,7 +64,7 @@ namespace Tests
         }
         
         [Test]
-        public void PieceCapture()
+        public void MoveCapturePiece()
         {
             m = moveObject.AddComponent<Move>();
             m.SetVal(2,2);
