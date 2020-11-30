@@ -6,14 +6,14 @@ namespace Lobby.Scripts
 {
     public class RoomListItem : MonoBehaviour
     {
-        [SerializeField] TMP_Text text = default;
+        [SerializeField] TMP_Text text;
 
-        public RoomInfo info;
+        private RoomInfo info;
 
-        public void SetUp(RoomInfo Info)
+        public void SetUp(RoomInfo rInfo)
         {
-            this.info = Info;
-            text.text = Info.Name;
+            info = rInfo;
+            text.text = rInfo.Name;
         }
 
         public void OnClick()

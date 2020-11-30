@@ -11,30 +11,28 @@ public class Board : MonoBehaviourPunCallbacks
     [Header("Instantiable Prefabs")] 
     public GameObject blackPiecePrefab = default;
     public GameObject whitePiecePrefab = default;
-    public GameObject highlightPrefab = default;
-    public GameObject movePrefab = default;
+    public GameObject highlightPrefab;
+    public GameObject movePrefab;
 
     [Header("Game Manager")] 
     private GameManager gm;
-    private Vector2 mouseOver = default;
+    private Vector2 mouseOver;
     private List<Move> highlights = new List<Move>(); //List of all possible moves
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
     public GameObject square = default;
     private Piece tPiece = default;
-    private Piece selected = default; //Selected piece (null if none selected)
-    private Move sMove = default;
-    bool multiCapture = false;
+    private Piece selected; //Selected piece (null if none selected)
+    private Move sMove;
+    bool multiCapture;
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
     [Header("Player Attributes")]
     //Change player color
     private string player1Color = "Dark";
     private string player2Color = "Light";
-    private int priority = default;
-    private string p1ID = default;
-    private string p2ID = default;
+    private int priority;
 
 
     [Header("Board Attributes")] 
@@ -51,7 +49,6 @@ public class Board : MonoBehaviourPunCallbacks
     public TextMeshProUGUI winText = default;
     
     private int P1Actor;
-    private int P2Actor;
 
     void Awake()
     {
@@ -393,7 +390,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
         else
         {
-            P2Actor = PhotonNetwork.LocalPlayer.ActorNumber;
+            // P2Actor = PhotonNetwork.LocalPlayer.ActorNumber;
             restartBtn.SetActive(false);
         }
         FindMoves();

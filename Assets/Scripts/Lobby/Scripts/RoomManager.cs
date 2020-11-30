@@ -39,7 +39,7 @@ namespace Lobby.Scripts
         {
             if (scene.buildIndex == 2)
             {
-                Debug.Log("Instantiated PlayerPrefab");
+                // Debug.Log("Instantiated PlayerPrefab");
                 PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerManager"), Vector3.zero,
                     Quaternion.identity);
             }

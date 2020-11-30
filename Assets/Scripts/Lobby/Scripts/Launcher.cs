@@ -10,15 +10,15 @@ namespace Lobby.Scripts
     public class Launcher : MonoBehaviourPunCallbacks
     {
         public static Launcher Instance;
-        [SerializeField] TMP_Text errorText = default;
-        [SerializeField] Transform playerListContent = default;
-        [SerializeField] GameObject playerListItemPrefab = default;
-        [SerializeField] Transform roomListContent = default;
-        [SerializeField] GameObject roomListItemPrefab = default;
+        [SerializeField] TMP_Text errorText;
+        [SerializeField] Transform playerListContent;
+        [SerializeField] GameObject playerListItemPrefab;
+        [SerializeField] Transform roomListContent;
+        [SerializeField] GameObject roomListItemPrefab;
 
-        [SerializeField] TMP_InputField roomNameInputField = default;
-        [SerializeField] TMP_Text roomNameText = default;
-        [SerializeField] GameObject startGameButton = default;
+        [SerializeField] TMP_InputField roomNameInputField;
+        [SerializeField] TMP_Text roomNameText;
+        [SerializeField] GameObject startGameButton;
 
         void Awake()
         {
@@ -35,22 +35,18 @@ namespace Lobby.Scripts
 
         public void Start()
         {
-            Debug.Log($"Network: {PhotonNetwork.IsConnected}");
-            Debug.Log($"Room: {PhotonNetwork.InRoom}");
+            // Debug.Log($"Network: {PhotonNetwork.IsConnected}");
+            // Debug.Log($"Room: {PhotonNetwork.InRoom}");
             if (PhotonNetwork.IsConnected == false)
             {
-                Debug.Log("Connected to Server");
+                // Debug.Log("Connected to Server");
                 PhotonNetwork.ConnectUsingSettings();
-                Debug.Log($"Network: {PhotonNetwork.IsConnected}");
-                Debug.Log($"Room: {PhotonNetwork.InRoom}");
             }
         }
 
         public override void OnConnectedToMaster()
         {
-            Debug.Log("Connected to Master");
-
-            Debug.Log($"Net Connection: {PhotonNetwork.IsConnected}");
+            // Debug.Log("Connected to Master");
 
             PhotonNetwork.JoinLobby();
             PhotonNetwork.AutomaticallySyncScene = true;
@@ -59,7 +55,7 @@ namespace Lobby.Scripts
         public override void OnJoinedLobby()
         {
             MenuManager.Instance.OpenMenu("title");
-            Debug.Log("Joined Lobby");
+            // Debug.Log("Joined Lobby");
             PhotonNetwork.NickName = "Player " + Random.Range(0, 1000).ToString("0000");
         }
 

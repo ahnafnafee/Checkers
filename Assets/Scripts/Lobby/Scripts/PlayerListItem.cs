@@ -8,9 +8,9 @@ namespace Lobby.Scripts
 {
     public class PlayerListItem : MonoBehaviourPunCallbacks
     {
-        [SerializeField] TMP_Text text = default;
-        [SerializeField] GameObject partyLeader = default;
-        [SerializeField] GameObject youText = default;
+        [SerializeField] TMP_Text text;
+        [SerializeField] GameObject partyLeader;
+        [SerializeField] GameObject youText;
         Player player;
         private int pNum;
         

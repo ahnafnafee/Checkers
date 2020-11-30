@@ -3,11 +3,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "TestScriptAssembly",
-        "LobbyAssembly",
-        "PhotonRealtime",
-        "PhotonUnityNetworking",
-        "Unity.TextMeshPro"
+        "TestScriptAssembly"
     ],
     "includePlatforms": [
         "Editor"

@@ -11,8 +11,8 @@ namespace Lobby.Scripts
     {
         public static MenuManager Instance;
 
-        [SerializeField] Menu[] menus = default;
-        [SerializeField] Button startGameButton = default;
+        [SerializeField] Menu[] menus;
+        [SerializeField] Button startGameButton;
 
         void Awake()
         {
