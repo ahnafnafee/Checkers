@@ -9,8 +9,8 @@ public class Board : MonoBehaviourPunCallbacks
     public static Board Instance;
 
     [Header("Instantiable Prefabs")]
-    public GameObject highlightPrefab;
-    public GameObject movePrefab;
+    [SerializeField] private GameObject highlightPrefab;
+    [SerializeField] private GameObject movePrefab;
 
     [Header("Game Manager")] 
     private GameManager gm;
@@ -25,8 +25,8 @@ public class Board : MonoBehaviourPunCallbacks
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
     [Header("Player Attributes")]
-    private readonly string player1Color = "Dark";
-    private readonly string player2Color = "Light";
+    private const string Player1Color = "Dark";
+    private const string Player2Color = "Light";
     private int priority;
 
 
@@ -37,21 +37,21 @@ public class Board : MonoBehaviourPunCallbacks
     private bool gameCompleted;
 
     [Header("GUI")] 
-    public GameObject winGUI;
-    public GameObject restartBtn;
-    public GameObject playerSelected1;
-    public GameObject playerSelected2;
-    public TextMeshProUGUI winText;
+    [SerializeField] private GameObject winGUI;
+    [SerializeField] private GameObject restartBtn;
+    [SerializeField] private GameObject playerSelected1;
+    [SerializeField] private GameObject playerSelected2;
+    [SerializeField] private TextMeshProUGUI winText;
     
-    private int P1Actor;
+    private int p1Actor;
 
-    void Awake()
+    private void Awake()
     {
         Instance = this;
         pv = GetComponent<PhotonView>();
     }
 
-    void Start()
+    private void Start()
     {
         // Default conditions
         isClickable = true;
@@ -93,7 +93,7 @@ public class Board : MonoBehaviourPunCallbacks
             // For awarding win to player if the other player disconnects
             if (PhotonNetwork.CurrentRoom.PlayerCount <= 1 && !gameCompleted)
             {
-                pv.RPC("EndGame", RpcTarget.All, P1Actor == PhotonNetwork.LocalPlayer.ActorNumber ? 1 : 2);
+                pv.RPC("EndGame", RpcTarget.All, p1Actor == PhotonNetwork.LocalPlayer.ActorNumber ? 1 : 2);
                 PhotonNetwork.CurrentRoom.IsVisible = false;
                 restartBtn.SetActive(false);
             } 
@@ -134,60 +134,58 @@ public class Board : MonoBehaviourPunCallbacks
         var x = (int) mouseOver.x;
         var y = (int) mouseOver.y;
 
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0)) return;
+        //DebugBoard();
+        if ((IsPlayer1() ? 1 : 2) != turn)
+            return;
+        if (turn == 2)
         {
-            //DebugBoard();
-            if ((IsPlayer1() ? 1 : 2) != turn)
+            x = 7 - x;
+            y = 7 - y;
+        }
+
+        if (multiCapture)
+        {
+            var selectedMove = CheckValid(x, y);
+            if (selectedMove != null)
+            {
+                sMove = selectedMove;
+                MovePiece();
+
+                if (!multiCapture)
+                    Invoke(nameof(CheckWin), 0.1f);
+            }
+            if (!multiCapture)
+            {
+                ClearHighlights();
+                //DebugBoard();
+            }
+        }
+        else if (selected == null) //No pieces are selected
+        {
+            SelectPiece(x, y);
+        }
+        else //A piece is already selected
+        {
+            selected.Select(false);
+            if (SelectPiece(x, y))//If not selecting another piece
                 return;
-            if (turn == 2)
-            {
-                x = 7 - x;
-                y = 7 - y;
-            }
-            
-            if (multiCapture)
-            {
-                var selectedMove = CheckValid(x, y);
-                if (selectedMove != null)
-                {
-                    sMove = selectedMove;
-                    MovePiece();
 
-                    if (!multiCapture)
-                        Invoke(nameof(CheckWin), 0.1f);
-                }
-                if (!multiCapture)
-                {
-                    ClearHighlights();
-                    //DebugBoard();
-                }
-            }
-            else if (selected == null) //No pieces are selected
+            Move selectedMove = CheckValid(x, y);
+            if (selectedMove != null)
             {
-                SelectPiece(x, y);
-            }
-            else //A piece is already selected
-            {
-                selected.Select(false);
-                if (SelectPiece(x, y))//If not selecting another piece
-                    return;
-                
-                Move selectedMove = CheckValid(x, y);
-                if (selectedMove != null)
-                {
-                    sMove = selectedMove;
-                    MovePiece();
+                sMove = selectedMove;
+                MovePiece();
 
-                    //Wait 0.1 sec second and check if valid 
-                    //might need more testing depending on ping
-                    if (!multiCapture)
-                        Invoke(nameof(CheckWin), 0.1f);
-                }
+                //Wait 0.1 sec second and check if valid
+                //might need more testing depending on ping
                 if (!multiCapture)
-                {
-                    ClearHighlights();
-                    //DebugBoard();
-                }
+                    Invoke(nameof(CheckWin), 0.1f);
+            }
+            if (!multiCapture)
+            {
+                ClearHighlights();
+                //DebugBoard();
             }
         }
     }
@@ -336,7 +334,7 @@ public class Board : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             //Debug.Log("ONLY MASTER");
-            P1Actor = PhotonNetwork.LocalPlayer.ActorNumber;
+            p1Actor = PhotonNetwork.LocalPlayer.ActorNumber;
 
             for (var y = 0; y < 3; y++)
             {
@@ -359,7 +357,7 @@ public class Board : MonoBehaviourPunCallbacks
     private void CreatePiece(int x, int y, int player)
     {
         Piece p;
-        p = CreatePiecePrefab(player == 1 ? player1Color : player2Color);
+        p = CreatePiecePrefab(player == 1 ? Player1Color : Player2Color);
 
         // NetSynced Move
         var pView = p.GetComponent<PhotonView>();
@@ -455,7 +453,7 @@ public class Board : MonoBehaviourPunCallbacks
         isClickable = false;
         gameCompleted = true;
         
-        winText.text = "Player " + player + " (" + ((player == 1) ? player1Color : player2Color) + ") wins";
+        winText.text = "Player " + player + " (" + ((player == 1) ? Player1Color : Player2Color) + ") wins";
         //Debug.Log("P" + player + " won / " + ((player == 1) ? player1Color : player2Color));
     }
 
