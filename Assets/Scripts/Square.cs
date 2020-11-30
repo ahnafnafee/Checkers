@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    protected int Priority = 0;
+    protected int Priority;
 
-    protected int X = 0;
-    protected int Y = 0;
+    protected int X;
+    protected int Y;
     
     public int GetPriority()
     {

@@ -7,7 +7,7 @@ using UnityEngine;
 public class Piece : Square
 {
     private readonly Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
-    private bool king = false;
+    private bool king;
     private List<Move> moves = new List<Move>();
     private readonly Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
     private int player;
@@ -35,14 +35,14 @@ public class Piece : Square
         gameObject.transform.Find("crown").gameObject.SetActive(true);
     }
 
-    public void Select(bool select)
+    public void Select(bool state)
     {
-        gameObject.transform.Find("selected").gameObject.SetActive(select);
+        gameObject.transform.Find("selected").gameObject.SetActive(state);
     }
 
-    public void HighlightPiece(bool select)
+    public void HighlightPiece(bool state)
     {
-        gameObject.transform.Find("movable").gameObject.SetActive(select);
+        gameObject.transform.Find("movable").gameObject.SetActive(state);
     }
 
     public List<Move> GetMoves()
