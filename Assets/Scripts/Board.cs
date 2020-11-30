@@ -21,23 +21,21 @@ public class Board : MonoBehaviourPunCallbacks
 
     [Header("Piece Attributes")]
     private bool isClickable = true;
-    private Piece tPiece = default;
     private Piece selected; //Selected piece (null if none selected)
     private Move sMove;
-    bool multiCapture;
+    private bool multiCapture;
     private Vector2 pieceOffset = new Vector2(0.5f, 0.5f);
 
     [Header("Player Attributes")]
-    //Change player color
-    private string player1Color = "Dark";
-    private string player2Color = "Light";
+    private readonly string player1Color = "Dark";
+    private readonly string player2Color = "Light";
     private int priority;
 
 
     [Header("Board Attributes")] 
     private PhotonView pv;
     private int turn = 1; //1 = player 1; 2 = player 2
-    private Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
+    private readonly Vector2 boardOffset = new Vector2(-4.0f, -4.0f);
     private bool gameCompleted;
 
     [Header("GUI")] 
