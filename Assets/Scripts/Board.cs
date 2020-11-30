@@ -8,9 +8,7 @@ public class Board : MonoBehaviourPunCallbacks
 {
     public static Board Instance;
 
-    [Header("Instantiable Prefabs")] 
-    public GameObject blackPiecePrefab = default;
-    public GameObject whitePiecePrefab = default;
+    [Header("Instantiable Prefabs")]
     public GameObject highlightPrefab;
     public GameObject movePrefab;
 
