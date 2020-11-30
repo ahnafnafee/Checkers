@@ -22,21 +22,11 @@ namespace Lobby.Scripts
 
         void Awake()
         {
-            // Ensures there is only 1 Launcher
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            DontDestroyOnLoad(gameObject);
             Instance = this;
         }
 
         void Start()
         {
-            // Debug.Log($"Network: {PhotonNetwork.IsConnected}");
-            // Debug.Log($"Room: {PhotonNetwork.InRoom}");
             if (PhotonNetwork.IsConnected == false)
             {
                 // Debug.Log("Connected to Server");

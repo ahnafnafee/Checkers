@@ -27,7 +27,7 @@ PluginImporter:
         Exclude WebGL: 0
         Exclude Win: 0
         Exclude Win64: 0
-        Exclude WindowsStoreApps: 1
+        Exclude WindowsStoreApps: 0
   - first:
       '': Lumin
     second:
@@ -52,7 +52,7 @@ PluginImporter:
       settings:
         CPU: AnyCPU
         DontProcess: False
-        PlaceholderPath:
+        PlaceholderPath: 
         SDK: AnySDK
         ScriptingBackend: Il2Cpp
   - first:
@@ -72,7 +72,7 @@ PluginImporter:
       settings:
         CPU: ARMv7
   - first:
-      Any:
+      Any: 
     second:
       enabled: 1
       settings: {}
@@ -128,7 +128,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU:
+        CPU: 
   - first:
       Standalone: OSXUniversal
     second:
@@ -155,11 +155,11 @@ PluginImporter:
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: AnyCPU
         DontProcess: False
-        PlaceholderPath:
+        PlaceholderPath: 
         SDK: AnySDK
         ScriptingBackend: Il2Cpp
   - first:
@@ -172,15 +172,15 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CompileFlags:
-        FrameworkDependencies:
+        CompileFlags: 
+        FrameworkDependencies: 
   - first:
       tvOS: tvOS
     second:
       enabled: 1
       settings:
-        CompileFlags:
-        FrameworkDependencies:
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+        CompileFlags: 
+        FrameworkDependencies: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

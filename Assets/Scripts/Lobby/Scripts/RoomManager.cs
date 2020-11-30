@@ -12,27 +12,32 @@ namespace Lobby.Scripts
 
         void Awake()
         {
-            // Ensures there is only 1 RoomManager
-            if (Instance)
+            if (Instance == null)
             {
-                Destroy(gameObject);
-                return;
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
             }
-
-            DontDestroyOnLoad(gameObject);
-            Instance = this;
+            else
+                Destroy(gameObject);
         }
 
         public override void OnEnable()
         {
-            base.OnEnable();
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            if (SceneManager.GetActiveScene().buildIndex >= 2)
+            {
+                base.OnEnable();
+                SceneManager.sceneLoaded += OnSceneLoaded;
+            }
+
         }
 
         public override void OnDisable()
         {
-            base.OnDisable();
-            SceneManager.sceneLoaded -= OnSceneLoaded;
+            if (SceneManager.GetActiveScene().buildIndex >= 2)
+            {
+                base.OnDisable();
+                SceneManager.sceneLoaded -= OnSceneLoaded;
+            }
         }
 
         void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)

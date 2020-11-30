@@ -28,10 +28,7 @@ namespace Photon.Chat
     {
         /// <summary>Name Server Host Name for Photon Cloud. Without port and without any prefix.</summary>
         public string NameServerHost = "ns.exitgames.com";
-
-        /// <summary>Name Server for HTTP connections to the Photon Cloud. Includes prefix and port.</summary>
-        public string NameServerHttp = "http://ns.exitgamescloud.com:80/photon/n";
-
+        
         /// <summary>Name Server port per protocol (the UDP port is different than TCP, etc).</summary>
         private static readonly Dictionary<ConnectionProtocol, int> ProtocolToNameServerPort = new Dictionary<ConnectionProtocol, int>() { { ConnectionProtocol.Udp, 5058 }, { ConnectionProtocol.Tcp, 4533 }, { ConnectionProtocol.WebSocket, 9093 }, { ConnectionProtocol.WebSocketSecure, 19093 } }; //, { ConnectionProtocol.RHttp, 6063 } };
 
@@ -95,6 +92,9 @@ namespace Photon.Chat
             #endif
         }
 
+        /// <summary>If not zero, this is used for the name server port on connect. Independent of protocol (so this better matches). Set by ChatClient.ConnectUsingSettings.</summary>
+        /// <remarks>This is reset when the protocol fallback is used.</remarks>
+        public ushort NameServerPortOverride;
 
         /// <summary>
         /// Gets the NameServer Address (with prefix and port), based on the set protocol (this.UsedProtocol).
@@ -104,16 +104,18 @@ namespace Photon.Chat
         {
             var protocolPort = 0;
             ProtocolToNameServerPort.TryGetValue(this.TransportProtocol, out protocolPort);
+            
+            if (this.NameServerPortOverride != 0)
+            {
+                this.Listener.DebugReturn(DebugLevel.INFO, string.Format("Using NameServerPortInAppSettings as port for Name Server: {0}", this.NameServerPortOverride));
+                protocolPort = this.NameServerPortOverride;
+            }
 
             switch (this.TransportProtocol)
             {
                 case ConnectionProtocol.Udp:
                 case ConnectionProtocol.Tcp:
                     return string.Format("{0}:{1}", NameServerHost, protocolPort);
-                #if RHTTP
-                case ConnectionProtocol.RHttp:
-                    return NameServerHttp;
-                #endif
                 case ConnectionProtocol.WebSocket:
                     return string.Format("ws://{0}:{1}", NameServerHost, protocolPort);
                 case ConnectionProtocol.WebSocketSecure:
@@ -318,6 +320,20 @@ namespace Photon.Chat
         public override string ToString()
         {
             return string.Format("AuthenticationValues Type: {3} UserId: {0}, GetParameters: {1} Token available: {2}", this.UserId, this.AuthGetParameters, !string.IsNullOrEmpty(this.Token), this.AuthType);
+        }
+
+        /// <summary>
+        /// Make a copy of the current object.
+        /// </summary>
+        /// <param name="copy">The object to be copied into.</param>
+        /// <returns>The copied object.</returns>
+        public AuthenticationValues CopyTo(AuthenticationValues copy)
+        {
+            copy.AuthType = this.AuthType;
+            copy.AuthGetParameters = this.AuthGetParameters;
+            copy.AuthPostData = this.AuthPostData;
+            copy.UserId = this.UserId;
+            return copy;
         }
     }
 

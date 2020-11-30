@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     {
         if ((Input.anyKey) && SceneManager.GetActiveScene().buildIndex == 0)
         {
-            SceneManager.LoadSceneAsync(1);
+            SceneManager.LoadScene(1);
         }
     }
 
@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     public void LoadLobby()
     {
+        Destroy(RoomManager.Instance.gameObject);
         StartCoroutine(DisconnectAndLoad());
     }
 
@@ -31,7 +32,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         PhotonNetwork.Disconnect();
         while (PhotonNetwork.IsConnected)
         {
-            Debug.Log($"Within While Loop: {PhotonNetwork.IsConnected}");
             yield return null;
         }
 

@@ -48,7 +48,7 @@ namespace Photon.Pun
 
 
         [NonSerialized]
-        private int ownerActorNr; // TODO maybe changing this should trigger "Was Transfered"!?
+        private int ownerActorNr; // TODO maybe changing this should trigger "Was Transferred"!?
 
         [FormerlySerializedAs("group")]
         public byte Group = 0;
@@ -354,6 +354,8 @@ namespace Photon.Pun
             this.ownerActorNr = newOwnerId;
             this.AmOwner = newOwner == PhotonNetwork.LocalPlayer;
 
+            UpdateCallbackLists();
+
             if (newOwner != prevOwner)
                 if (!ReferenceEquals(OnOwnerChangeCallbacks, null))
                     for (int i = 0, cnt = OnOwnerChangeCallbacks.Count; i < cnt; ++i)
@@ -646,7 +648,7 @@ namespace Photon.Pun
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
                     Debug.LogWarning("Attempting to RequestOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                        ", but PhotonView.OwnershipTranfer is set to Fixed.");
+                        ", but PhotonView.OwnershipTransfer is set to Fixed.");
                 }
             }
         }
@@ -689,10 +691,10 @@ namespace Photon.Pun
                 {
                     if (OwnershipTransfer == OwnershipOption.Fixed)
                         Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                            " without the authority to do so. TransferOwnership is not allowed if PhotonView.OwnershipTranfer is set to Fixed.");
+                            " without the authority to do so. TransferOwnership is not allowed if PhotonView.OwnershipTransfer is set to Fixed.");
                     else if (OwnershipTransfer == OwnershipOption.Request)
                         Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                           " without the authority to do so. PhotonView.OwnershipTranfer is set to Request, so only the controller of this object can TransferOwnership.");
+                           " without the authority to do so. PhotonView.OwnershipTransfer is set to Request, so only the controller of this object can TransferOwnership.");
                 }
             }
         }
@@ -793,7 +795,7 @@ namespace Photon.Pun
         }
 
         /// <summary>
-        /// Call a RPC method of this GameObject on remote clients of this room (or on all, inclunding this client).
+        /// Call a RPC method of this GameObject on remote clients of this room (or on all, including this client).
         /// </summary>
         /// <remarks>
         /// [Remote Procedure Calls](@ref rpcManual) are an essential tool in making multiplayer games with PUN.
@@ -842,7 +844,7 @@ namespace Photon.Pun
         }
 
         /// <summary>
-        /// Call a RPC method of this GameObject on remote clients of this room (or on all, inclunding this client).
+        /// Call a RPC method of this GameObject on remote clients of this room (or on all, including this client).
         /// </summary>
         /// <remarks>
         /// [Remote Procedure Calls](@ref rpcManual) are an essential tool in making multiplayer games with PUN.
