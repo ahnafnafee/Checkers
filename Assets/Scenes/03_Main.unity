@@ -5565,7 +5565,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4157759716334776426}
-  - component: {fileID: 4157759716334776429}
   m_Layer: 0
   m_Name: HelpMenu
   m_TagString: Untagged
@@ -5573,20 +5572,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &4157759716334776429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4157759716334776427}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0f7b47b7b9b51447b64af458b62fb2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  menuName: credits
-  open: 0
 --- !u!222 &4157759716368599313
 CanvasRenderer:
   m_ObjectHideFlags: 0

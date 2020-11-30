@@ -8,19 +8,19 @@ namespace Lobby.Scripts
 {
     public class RoomManager : MonoBehaviourPunCallbacks
     {
-        private static RoomManager _instance;
+        public static RoomManager Instance;
 
         void Awake()
         {
             // Ensures there is only 1 RoomManager
-            if (_instance)
+            if (Instance)
             {
                 Destroy(gameObject);
                 return;
             }
 
             DontDestroyOnLoad(gameObject);
-            _instance = this;
+            Instance = this;
         }
 
         public override void OnEnable()

@@ -33,7 +33,7 @@ namespace Lobby.Scripts
             Instance = this;
         }
 
-        public void Start()
+        void Start()
         {
             // Debug.Log($"Network: {PhotonNetwork.IsConnected}");
             // Debug.Log($"Room: {PhotonNetwork.InRoom}");
@@ -47,7 +47,6 @@ namespace Lobby.Scripts
         public override void OnConnectedToMaster()
         {
             // Debug.Log("Connected to Master");
-
             PhotonNetwork.JoinLobby();
             PhotonNetwork.AutomaticallySyncScene = true;
         }
@@ -67,7 +66,7 @@ namespace Lobby.Scripts
             }
 
             // Room attributes
-            RoomOptions roomOps = new RoomOptions {IsVisible = true, IsOpen = true, MaxPlayers = 2};
+            RoomOptions roomOps = new RoomOptions() {IsVisible = true, IsOpen = true, MaxPlayers = 2};
 
             PhotonNetwork.CreateRoom(roomNameInputField.text, roomOps);
             MenuManager.Instance.OpenMenu("loading");
