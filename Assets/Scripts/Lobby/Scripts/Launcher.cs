@@ -67,7 +67,7 @@ namespace Lobby.Scripts
             }
 
             // Room attributes
-            RoomOptions roomOps = new RoomOptions() {IsVisible = true, IsOpen = true, MaxPlayers = 2};
+            RoomOptions roomOps = new RoomOptions {IsVisible = true, IsOpen = true, MaxPlayers = 2};
 
             PhotonNetwork.CreateRoom(roomNameInputField.text, roomOps);
             MenuManager.Instance.OpenMenu("loading");
